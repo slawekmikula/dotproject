@@ -102,7 +102,7 @@ if (!$canRead) {
 $file_id = isset($_GET['file_id']) ? $_GET['file_id'] : 0;
 
 if ($file_id) {
-	// projects tat are denied access
+	// projects that are denied access
 	require_once($AppUI->getModuleClass('projects'));
 	require_once($AppUI->getModuleClass('files'));
 	$project =& new CProject;

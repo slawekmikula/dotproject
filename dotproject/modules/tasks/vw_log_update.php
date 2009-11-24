@@ -6,7 +6,7 @@ if (!defined('DP_BASE_DIR')) {
 global $AppUI, $task_id, $obj, $percent, $can_edit_time_information;
 
 // check permissions
-if (!getPermission('tasks', 'edit', $task_id)) {
+if (!getPermission('task_log', 'edit', $task_id) && !getPermission('task_log', 'add', $task_id)) {
 	$AppUI->redirect('m=public&a=access_denied');
 }
 

@@ -1607,7 +1607,7 @@ class CTask extends CDpObject
 			$number_assigned_users = count($assigned_users);
 		}
 		
-		$number_of_weeks_worked = $task_finish_date->workingDaysInSpan($task_start_date) 
+		$number_of_weeks_worked = $task_finish_date->workingDaysInSpan($task_start_date)
 			/ count(explode(',', dPgetConfig('cal_working_days')));	
 		$number_of_weeks_worked = (($number_of_weeks_worked < 1) 
 								   ? ceil($number_of_weeks_worked) : $number_of_weeks_worked);

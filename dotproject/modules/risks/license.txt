@@ -1,0 +1,18 @@
+The module is a complete rebuild and cleanup of the previous Risk Management 
+Module built by Richard Thompson and released to CaseySoftware, LLC for future 
+development and maintenance.  It is released here under GPL v2.
+
+Copyright (c) 2005-2007 CaseySoftware, LLC <webmaster@caseysoftware.com>
+
+Special credit and acknowledgement goes to:
+
+- Richard Thompson <no email available> for developing the initial version;
+
+- dotProject Development Team Member Ivan Peevski 
+<cyberhorse@users.sourceforge.net> for his work for CaseySoftware in making 
+v2.0 happen;
+
+- dotProject Development Team member Keith Casey 
+<caseydk@users.sourceforge.net>, CEO of CaseySoftware for the initial 
+specification, implementing permissions, implementing the dotProject v2.1 
+security model, and all development after v2.0;

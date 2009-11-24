@@ -8,6 +8,7 @@ $do_report = dPgetParam($_POST, 'do_report', 0);
 $hideNonWd = dPgetParam($_POST, 'hideNonWd', 0);
 $log_start_date = dPgetParam($_POST, 'log_start_date', 0);
 $log_end_date = dPgetParam($_POST, 'log_end_date', 0);
+$log_all_projects = dPgetParam($_POST, 'log_all_projects', 0);
 $use_assigned_percentage = dPgetParam($_POST, 'use_assigned_percentage', 0);
 $user_id = dPgetParam($_POST, 'user_id', $AppUI->user_id);
 
@@ -128,7 +129,7 @@ if ($do_report) {
 	if ($user_id) {
 		$q->addWhere("t.task_owner = '$user_id'");
     }
-	if ($project_id != 0) {
+	if ($project_id != 0 && !$log_all_projects) {
 		$q->addWhere("t.task_project='$project_id'");
 	}
 	
@@ -233,35 +234,28 @@ function userUsageWeeks() {
 	global $task_start_date, $task_end_date, $day_difference, $hours_added, $actual_date;
 	global $users, $user_data, $user_usage,$use_assigned_percentage, $user_tasks_counted_in, $task;
 	global $start_date, $end_date;
-	
+
+	$actual_date = clone $start_date;
+    $start = clone $start_date;
+    $end = clone $end_date;
 	$task_duration_per_week = $task->getTaskDurationPerWeek($use_assigned_percentage);
-	setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
-	$ted = new CDate(Date_Calc::endOfWeek($task_end_date->day,$task_end_date->month,$task_end_date->year));
-	$tsd = new CDate(Date_Calc::beginOfWeek($task_start_date->day,$task_start_date->month,$task_start_date->year));
-	$ed = new CDate(Date_Calc::endOfWeek($end_date->day,$end_date->month,$end_date->year));
-	$sd = new CDate(Date_Calc::beginOfWeek($start_date->day,$start_date->month,$start_date->year));
-	setlocale(LC_ALL, $AppUI->user_lang);
-	
-	$week_difference = $end_date->workingDaysInSpan($start_date)/count(explode(",",dPgetConfig("cal_working_days")));
-	
-	$actual_date = $start_date;
+	$week_difference = ceil($start->workingDaysInSpan($end)/count(explode(",",dPgetConfig("cal_working_days"))));
 	
 	for ($i = 0; $i<=$week_difference; $i++) {
-		if (!$actual_date->before($tsd) && !$actual_date->after($ted)) {
-			setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
-			$awoy = $actual_date->year.Date_Calc::weekOfYear($actual_date->day,$actual_date->month,$actual_date->year);
-			setlocale(LC_ALL, $AppUI->user_lang);
+        if ($actual_date->getWeekOfYear() >= $task_start_date->getWeekOfYear() &&
+            $actual_date->getWeekOfYear() <= $task_end_date->getWeekOfYear()) {
+
 			foreach ($users as $user_id => $user_data) {
-				if (!isset($user_usage[$user_id][$awoy])) {
-					$user_usage[$user_id][$awoy] = 0;
+				if (!isset($user_usage[$user_id][$actual_date->format('%Y%m%d')])) {
+					$user_usage[$user_id][$actual_date->format('%Y%m%d')] = 0;
 				}
 				$percentage_assigned = $use_assigned_percentage ? ($user_data['perc_assignment']/100) : 1;
 				$hours_added = $task_duration_per_week * $percentage_assigned;
-				$user_usage[$user_id][$awoy] += $hours_added;
-				if ($user_usage[$user_id][$awoy] < 0.005) {
+				$user_usage[$user_id][$actual_date->format('%Y%m%d')] += $hours_added;
+				if ($user_usage[$user_id][$actual_date->format('%Y%m%d')] < 0.005) {
 					// We want to show at least 0.01 even when the assigned time is very small
 					// so we know that at that time the user has a running task
-					$user_usage[$user_id][$awoy] += 0.006;
+					$user_usage[$user_id][$actual_date->format('%Y%m%d')] += 0.006;
 					$hours_added += 0.006;
 				}
 				
@@ -292,39 +286,33 @@ function showWeeks() {
 	
 	$working_days_count = 0;
 	$allocated_hours_sum = 0;
-	
-	setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
-	$ed = new CDate(Date_Calc::endOfWeek($end_date->day,$end_date->month,$end_date->year));
-	$sd = new CDate(Date_Calc::beginOfWeek($start_date->day,$start_date->month,$start_date->year));
-	setlocale(LC_ALL, $AppUI->user_lang);
-	
-	$week_difference = ceil($ed->workingDaysInSpan($sd)/count(explode(',',dPgetConfig('cal_working_days'))));
-	
-	$actual_date = $sd;
-	
-	$table_header = '<tr><th>'.$AppUI->_('User').'</th>';
+
+	$actual_date = clone $start_date;
+    $start = clone $start_date;
+    $end = clone $end_date;
+
+	$week_difference = $start->workingDaysInSpan($end)/count(explode(',',dPgetConfig('cal_working_days')));
+		$table_header = '<tr><th>'.$AppUI->_('User').'</th>';
 	for ($i=0; $i<$week_difference; $i++) {
 		$actual_date->addSeconds(168*3600);	// + one week
 		$working_days_count = $working_days_count + count(explode(',',dPgetConfig('cal_working_days')));
+        $table_header .= '<th>'.$AppUI->_('Week') . " " . $actual_date->getWeekOfYear() .'</th>';
 	}
-	$table_header .= '<th nowrap="nowrap" colspan="2">'.$AppUI->_('Allocated').'</th></tr>';
-	
+
+	$table_header .= '<th nowrap="nowrap" colspan="2">'.$AppUI->_('Allocated').'</th></tr>';	
 	$table_rows = '';
+    $actual_date = clone $start_date;
 	
 	foreach ($user_list as $user_id => $user_data) {
 	    @$user_names[$user_id] = $user_data['user_username'];
 		if (isset($user_usage[$user_id])) {
 			$table_rows .= '<tr><td nowrap="nowrap">('.$user_data['user_username'].') '.$user_data['contact_first_name'].' '.$user_data['contact_last_name'].'</td>';
-			$actual_date = $sd;
-/*
-			for ($i=0; $i<$week_difference; $i++) { 
-				setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
-				$awoy = $actual_date->year.Date_Calc::weekOfYear($actual_date->day,$actual_date->month,$actual_date->year);
-				setlocale(LC_ALL, $AppUI->user_lang);
+			$actual_date = clone $start_date;
 
+			for ($i=0; $i<$week_difference; $i++) { 
 				$table_rows .= '<td align="right">';
-				if (isset($user_usage[$user_id][$awoy])) {
-					$hours = number_format($user_usage[$user_id][$awoy],2);
+				if (isset($user_usage[$user_id][$actual_date->format('%Y%m%d')])) {
+					$hours = number_format($user_usage[$user_id][$actual_date->format('%Y%m%d')],2);
 					$table_rows .= $hours;
 					$percentage_used = round(($hours/(dPgetConfig('daily_working_hours')*count(explode(',',dPgetConfig('cal_working_days')))))*100);
 					$bar_color = 'blue';
@@ -340,7 +328,7 @@ function showWeeks() {
 
 				$actual_date->addSeconds(168*3600);	// + one week
 			}
-*/
+
 			$array_sum = array_sum($user_usage[$user_id]);
 			
 			$average_user_usage = number_format(($array_sum/($week_difference * count(explode(',',dPgetConfig('cal_working_days')))*dPgetConfig('daily_working_hours')))*100, 2);
@@ -357,12 +345,9 @@ function showWeeks() {
 			$table_rows .= '</tr>';
 		}
 	}
-/*
-	$total_hours_capacity = $week_difference * count(explode(',',dPgetConfig('cal_working_days'))) * dPgetConfig('daily_working_hours') * count($user_usage);		
+
+	$total_hours_capacity = $week_difference * count(explode(',',dPgetConfig('cal_working_days'))) * dPgetConfig('daily_working_hours') * count($user_usage);
 	$total_hours_capacity_all = $week_difference * count(explode(',',dPgetConfig('cal_working_days'))) *dPgetConfig('daily_working_hours') * count($user_list);
-*/
-	$total_hours_capacity = $working_days_count/2*dPgetConfig('daily_working_hours')*count($user_usage);
-	$total_hours_capacity_all = $working_days_count/2*dPgetConfig('daily_working_hours')*count($user_list);
 }
 
 function userUsageDays() {
@@ -420,7 +405,7 @@ function showDays() {
 	
 	$days_difference =  $end_date->dateDiff($start_date);
 	
-	$actual_date = $start_date;
+	$actual_date = clone $start_date;
 	$working_days_count = 0;
 	$allocated_hours_sum = 0;
 	
@@ -429,8 +414,13 @@ function showDays() {
 		if ($actual_date->isWorkingDay()) {
 			$working_days_count++;
 		}
+        if (($hideNonWd && $actual_date->isWorkingDay()) || !$hideNonWd ) {
+            $table_header .= '<th>'. $actual_date->format('%d.%m') .'</th>';
+        }
 		$actual_date->addDays(1);
 	}
+    
+    $actual_date = $start_date;
 	$table_header .= '<th nowrap="nowrap" colspan="2">'.$AppUI->_('Allocated').'</th></tr>';
 	
 	$table_rows = '';
@@ -439,7 +429,7 @@ function showDays() {
 		if (isset($user_usage[$user_id])) {
 			$table_rows .= '<tr><td nowrap="nowrap">('.$user_data['user_username'].') '.$user_data['contact_first_name'].' '.$user_data['contact_last_name'].'</td>';
 			$actual_date = $start_date;
-/*
+
 			for ($i=0; $i<=$days_difference; $i++) {	
 				if (($actual_date->isWorkingDay()) || (!$actual_date->isWorkingDay() && !$hideNonWd)) {
 					$table_rows .= '<td>';
@@ -460,7 +450,7 @@ function showDays() {
 				}
 				$actual_date->addDays(1);
 			}
-*/
+
 			$array_sum = array_sum($user_usage[$user_id]);
 			$average_user_usage = number_format(($array_sum/($working_days_count*dPgetConfig('daily_working_hours')))*100, 2);
 			$allocated_hours_sum += $array_sum;
@@ -470,7 +460,7 @@ function showDays() {
 				$bar_color = 'red';
 				$average_user_usage = 100;
 			}
-			$table_rows .= '<td><div align="left">'.round($array_sum, 2).' '.$AppUI->_('hours').'</td> <td align="right"> '.$average_user_usage ;
+			$table_rows .= '<td nowrap="nowrap"><div align="left">'.round($array_sum, 2).' '.$AppUI->_('hours').'</td> <td align="right"> '.$average_user_usage ;
 			$table_rows .= '%</div>';
 			$table_rows .= '<div align="left" style="height:2px;width:' . $average_user_usage . '%; background-color:' . $bar_color . '">&nbsp;</div></td>';
 			$table_rows .= '</tr>';

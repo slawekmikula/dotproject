@@ -358,7 +358,7 @@ class CDate extends Date {
 		}	 
 		
 		$wd = 0;
-		$days = $e->dateDiff($this);
+		$days = abs($e->dateDiff($this));
 		$start = $this;
 		
 		for ($i = 0 ; $i <= $days ; $i++) {
@@ -370,5 +370,6 @@ class CDate extends Date {
 		
 		return $wd;
 	}
+    
 }
 ?>

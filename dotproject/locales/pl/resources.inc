@@ -1,0 +1,23 @@
+##
+## DO NOT MODIFY THIS FILE BY HAND!
+##
+"Add Resource"=>"Dodaj zasób",
+"All Resources"=>"Wszystkie zasoby",
+"Description"=>"Opis",
+"Details"=>"Szczegóły",
+"Equipment"=>"Sprzęt",
+"ID"=>"ID",
+"Max Alloc %"=>"Maks. przydział %",
+"Max Allocation %"=>"Maks. przydział %",
+"Maximum Allocation Percentage"=>"Maksymalny przydział procentowy",
+"Notes"=>"Notatki",
+"Resource ID"=>"ID Zasobu",
+"Resource Name"=>"Nazwa zasobu",
+"Tool"=>"Narzędzie",
+"Type"=>"Typ",
+"Venue"=>"Miejsce spotkania",
+"back"=>"wstecz",
+"doDelete"=>"",
+"new resource"=>"Nowy zasób",
+"resource list"=>"Lista zasobów",
+"submit"=>"zatwierdź",

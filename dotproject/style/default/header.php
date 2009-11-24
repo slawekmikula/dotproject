@@ -30,7 +30,7 @@ else
 	<th style="background: url(style/<?php echo $uistyle;?>/images/titlegrad.jpg);" class="banner" align="left"><strong><?php
 		echo "<a style='color: white' href='{$dPconfig['base_url']}'>$page_title</a>";
 	?></strong></th>
-	<th align="right" width='50'><a href='http://www.dotproject.net/' <?php if ($dialog) echo "target='_blank'"; ?>><img src="style/<?php echo $uistyle;?>/images/dp_icon.gif" border="0" /></a></th>
+
 	</tr></table></td>
 </tr>
 <?php if (!$dialog) {

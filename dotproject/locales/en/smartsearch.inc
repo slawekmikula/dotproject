@@ -15,3 +15,6 @@
 "Show empty",
 "Task Log",
 "Total records found",
+"Forum messages",
+"Task logs",
+

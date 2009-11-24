@@ -22,3 +22,4 @@
 "Repeat New Password",
 "submit",
 "View all allowed companies",
+"Select a company",

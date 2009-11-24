@@ -18,7 +18,16 @@ require_once DP_BASE_DIR . '/includes/db_adodb.php';
 db_connect(dPgetConfig('dbhost'), dPgetConfig('dbname'),
 dPgetConfig('dbuser'), dPgetConfig('dbpass'), dPgetConfig('dbpersist'));
 
-	
+//$sql = "SET character_set_results='utf8';";
+//$db->Execute($sql);
+//
+//$sql = "SET NAMES 'utf8';";
+//$db->Execute($sql);
+//
+//$sql = "SET CHARACTER SET utf8;";
+//$db->Execute($sql);
+
+
 // Quick hack to ensure MySQL behaves itself (#2323)
 $db->Execute("SET sql_mode := ''");
 

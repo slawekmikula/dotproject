@@ -58,3 +58,13 @@
 "URL",
 "Version",
 "Versions",
+"Folder Explorer",
+"Folder",
+"Move to Project",
+"No Project Association",
+"Move to Folder",
+"Result(s)",
+"No Result(s)",
+"Subfolder of",
+"Add File Folder",
+

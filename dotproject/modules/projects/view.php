@@ -196,8 +196,15 @@ if ($canEdit) {
 	if ($canDelete) {
 		$titleBlock->addCrumbDelete('delete project', $canDelete, $msg);
 	}
-	$titleBlock->addCrumb('?m=tasks&a=organize&project_id=' . $project_id, 'organize tasks');
 }
+if ($canAuthorTask) {
+    if ($AppUI->isActiveModule('projectdesigner')) {
+        $titleBlock->addCrumb('?m=projectdesigner&project_id=' . $project_id, 'organize tasks');
+    } else {
+        $titleBlock->addCrumb('?m=tasks&a=organize&project_id=' . $project_id, 'organize tasks');
+    }
+}
+
 $titleBlock->addCrumb('?m=projects&a=reports&project_id=' . $project_id, 'reports');
 $titleBlock->show();
 ?>
@@ -456,21 +463,17 @@ $query_string = ('?m=projects&a=view&project_id=' . $project_id);
 //Note that we now control these based upon module requirements.
 $canAccessTask = getPermission('tasks', 'access');
 $canAccessTaskLog = getPermission('task_log', 'access');
+$canAccessForum = getPermission('forums', 'access');
 $showEditCheckbox = false;
 
-if ($canAccessTask) {
+if ($AppUI->isActiveModule('tasks') && $canAccessTask) {
 	$tabBox->add(DP_BASE_DIR.'/modules/tasks/tasks', 'Tasks');
 	$tabBox->add(DP_BASE_DIR.'/modules/tasks/tasks', 'Tasks (Inactive)');
 }
-if (getPermission('forums', 'access')) {
+if ($AppUI->isActiveModule('forums') && $canAccessForum) {
 	$tabBox->add(DP_BASE_DIR.'/modules/projects/vw_forums', 'Forums');
 }
-/*
-if (getPermission('files', 'access')) {
-	$tabBox->add(DP_BASE_DIR.'/modules/projects/vw_files', 'Files');
-}
-*/
-if ($canAccessTask) {
+if ($AppUI->isActiveModule('tasks') && $canAccessTask) {
 	$tabBox->add(DP_BASE_DIR.'/modules/tasks/viewgantt', 'Gantt Chart');
 	if ($canAccessTaskLog) {
 		$tabBox->add(DP_BASE_DIR.'/modules/projects/vw_logs', 'Task Logs');

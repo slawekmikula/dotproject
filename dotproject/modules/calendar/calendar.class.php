@@ -111,15 +111,10 @@ class CMonthCalendar {
 		$this->next_year = new CDate($date);
 		$this->next_year->setYear($this->next_year->getYear()+1);
 		
-		setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
 		$date = Date_Calc::beginOfPrevMonth($d, $m, $y, FMT_TIMESTAMP_DATE);
-		setlocale(LC_ALL, $AppUI->user_lang);
-		
 		$this->prev_month = new CDate($date);
 		
-		setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
 		$date = Date_Calc::beginOfNextMonth($d, $m, $y, FMT_TIMESTAMP_DATE);
-		setlocale(LC_ALL, $AppUI->user_lang);
 		$this->next_month =  new CDate($date);
 	}
 
@@ -262,11 +257,9 @@ class CMonthCalendar {
 * @return string Returns table a row with the day names
 */
 	function _drawDays() {
-		global $AppUI;
+		global $AppUI, $locale_char_set;
 		
-		setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
 		$wk = Date_Calc::getCalendarWeek(null, null, null, '%a', LOCALE_FIRST_DAY);
-		setlocale(LC_ALL, $AppUI->user_lang);
 		
 		$s = (($this->showWeek) ? ("\n\t\t" . '<th>&nbsp;</th>') : '');
 		foreach ($wk as $day) {
@@ -291,9 +284,7 @@ class CMonthCalendar {
 		$this_day = intval($date->getDay());
 		$this_month = intval($date->getMonth());
 		$this_year = intval($date->getYear());
-		setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
 		$cal = Date_Calc::getCalendarMonth($this_month, $this_year, '%Y%m%d%w', LOCALE_FIRST_DAY);
-		setlocale(LC_ALL, $AppUI->user_lang);
 		
 		$df = $AppUI->getPref('SHDATEFORMAT');
 		
@@ -620,11 +611,9 @@ class CEvent extends CDpObject {
 		}
 		
 		//Calculate the Length of Period (Daily, Weekly, Monthly View)
-		setlocale(LC_ALL, 'en_AU'.(($locale_char_set)? ('.' . $locale_char_set) : '.utf8'));
 		$periodLength = Date_Calc::dateDiff($end_date->getDay(), $end_date->getMonth(), 
 											$end_date->getYear(), $start_date->getDay(), 
 											$start_date->getMonth(), $start_date->getYear());
-		setlocale(LC_ALL, $AppUI->user_lang);
 		foreach ($eventListRec as $key => $ia){
            	$end = intval($ia['event_times_recuring']);
            	for ($j=0; $j < $end; $j++) {

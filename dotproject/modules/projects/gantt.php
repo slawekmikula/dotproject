@@ -134,7 +134,7 @@ $graph->scale->actinfo->vgrid->SetColor('gray');
 $graph->scale->actinfo->SetColor('darkgray');
 $graph->scale->actinfo->SetColTitles(array($AppUI->_('Project name', UI_OUTPUT_RAW), 
                                            $AppUI->_('Start Date', UI_OUTPUT_RAW), 
-                                           $AppUI->_('Finish', UI_OUTPUT_RAW), 
+                                           $AppUI->_('Finish', UI_OUTPUT_RAW),
                                            $AppUI->_('Actual End', UI_OUTPUT_RAW)), 
                                      array(160, 70, 70, 70));
 
@@ -146,7 +146,7 @@ $graph->scale->tableTitle->Set($tableTitle);
 // try commenting out the following two lines if gantt charts do not display
 if (is_file(TTF_DIR . 'FreeSansBold.ttf')) {
 	$graph->scale->tableTitle->SetFont(FF_CUSTOM,FS_BOLD,12);
-}	
+}
 $graph->scale->SetTableTitleBackground('#EEEEEE');
 $graph->scale->tableTitle->Show(true);
 
@@ -211,10 +211,10 @@ if (!is_array($projects) || sizeof($projects) == 0) {
 
 if (is_array($projects)) {
 	foreach ($projects as $p) {
-		if ($locale_char_set=='utf-8' && function_exists('utf8_decode')) {
-			$name = ((mb_strlen(utf8_decode($p['project_name'])) > 25) 
-			         ? (mb_substr(utf8_decode($p['project_name']), 0, 22) . '...') 
-			         : utf8_decode($p['project_name']));
+		if ($locale_char_set=='utf-8' && function_exists('safe_utf8_decode')) {
+			$name = ((mb_strlen(safe_utf8_decode($p['project_name'])) > 25)
+			         ? (mb_substr(safe_utf8_decode($p['project_name']), 0, 22) . '...')
+			         : safe_utf8_decode($p['project_name']));
 		} else {
 			//while using charset different than UTF-8 we need not to use utf8_deocde
 			$name = ((mb_strlen($p['project_name']) > 25) ? (mb_substr($p['project_name'], 0, 22).'...') 

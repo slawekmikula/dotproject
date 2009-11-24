@@ -12,7 +12,7 @@ if (!defined('DP_BASE_DIR')) {
 */
 function cleanText($text) {
 	//This text file is not utf, its iso so we have to decode/encode
-	$text = utf8_decode($text);
+	$text = safe_utf8_decode($text);
 	$trade = array('�'=>'a','�'=>'a','�'=>'a',
                  '�'=>'a','�'=>'a',
                  '�'=>'A','�'=>'A','�'=>'A',

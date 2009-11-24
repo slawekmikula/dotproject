@@ -44,11 +44,13 @@ session_write_close();
 if ($session_id != "") {
     $params .= "&" . $session_id;
 }
-//        header("Refresh: 0; URL=fileviewer.php?$params");
+
+header("Refresh: 0; URL=index.php?" . $AppUI->state["SAVEDPLACE"]);
 echo '<script type="text/javascript">
 fileloader = window.open("fileviewer.php?'.$params.'", "mywindow",
-"location=1,status=1,scrollbars=0,width=20,height=20");
+"location=1,status=1,scrollbars=0,width=5,height=5");
 fileloader.moveTo(0,0);
 </script>';
+
 
 ?>

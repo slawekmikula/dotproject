@@ -8,6 +8,8 @@ require_once($AppUI->getModuleClass('files'));
 
 global $allowed_folders_ary, $denied_folders_ary, $limited;
 
+$AppUI->savePlace();
+
 $cfObj = new CFileFolder();
 $allowed_folders_ary = $cfObj->getAllowedRecords($AppUI->user_id);
 $denied_folders_ary = $cfObj->getDeniedRecords($AppUI->user_id);

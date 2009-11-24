@@ -57,3 +57,5 @@
 "View Company",
 "view this company",
 "Zip",
+"Helpdesk",
+"Projects gantt",

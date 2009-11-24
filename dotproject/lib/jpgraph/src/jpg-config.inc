@@ -64,7 +64,7 @@ DEFINE("CSIMCACHE_HTTP_DIR","csimcache/");
 // either FF_CHINESE or FF_BIG5
 define('TTF_DIR', DP_BASE_DIR . '/lib/fonts/');
 define('FF_CUSTOM', 18);
-define('BASE_FONT', 'FreeSans');
+define('BASE_FONT', 'Arial');
 define('CUSTOM_TTF_FONT', BASE_FONT . '.ttf');
 define('CUSTOM_TTF_FONT_BOLD', BASE_FONT.'Bold.ttf');
 define('CUSTOM_TTF_FONT_ITALIC', BASE_FONT.'Oblique.ttf');
@@ -73,12 +73,12 @@ define('CUSTOM_TTF_FONT_BOLDITALIC', BASE_FONT.'BoldOblique.ttf');
 DEFINE('CHINESE_TTF_FONT','bkai00mp.ttf');
 
 // Special unicode cyrillic language support
-DEFINE("LANGUAGE_CYRILLIC",true);
+DEFINE("LANGUAGE_CYRILLIC",false);
 
 // If you are setting this config to true the conversion
 // will assume that the input text is windows 1251, if
 // false it will assume koi8-r
-DEFINE("CYRILLIC_FROM_WINDOWS",true);
+DEFINE("CYRILLIC_FROM_WINDOWS",false);
 
 // The following constant is used to auto-detect
 // whether cyrillic conversion is really necessary 

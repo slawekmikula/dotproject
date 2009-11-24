@@ -1,0 +1,2 @@
+Alokacja godzin/użytkownik
+Raport pokazuje zaalokowanie godzin w projekcie na poszczególnych użytkowników systemu

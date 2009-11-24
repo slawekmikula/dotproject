@@ -1,0 +1,3 @@
+Zakończone
+Raport przedstawia zadania zakończone w ostatnim tygodniu
+suppressHeaders=1

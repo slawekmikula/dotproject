@@ -46,9 +46,6 @@ class Date_Calc
     function dateNow($format="%Y%m%d") { //dotProject-modified function
         global $locale_char_set;
         $now_date = strftime($format,time());
-        if ($locale_char_set != 'iso-8859-1') {
-            $now_date = mb_convert_encoding($now_date, $locale_char_set, 'iso-8859-1');
-        }
         return $now_date;
     } // end func dateNow
 
@@ -1586,10 +1583,6 @@ class Date_Calc
 		$Date_Calc_months = array();
 		for($i=1;$i<13;$i++){
 		    $Date_Calc_months[$i] = strftime('%B', mktime(0, 0, 0, $i, 1, 2001));
-            if ($locale_char_set != 'iso-8859-1') {
-                $Date_Calc_months[$i] = mb_convert_encoding($Date_Calc_months[$i], 
-                                                            $locale_char_set, 'iso-8859-1');
-            }
 		}
 	}
         return($Date_Calc_months);
@@ -1613,10 +1606,6 @@ class Date_Calc
         $now_date = strftime($format,time());
 		for($i=0;$i<7;$i++){
 		    $Date_Calc_weekdays[$i] = strftime('%A', mktime(0, 0, 0, 1, $i, 2001));
-            if ($locale_char_set != 'iso-8859-1') {
-                $Date_Calc_weekdays[$i] = mb_convert_encoding($Date_Calc_weekdays[$i], 
-                                                              $locale_char_set, 'iso-8859-1');
-            }
 		}
 	}
         return($Date_Calc_weekdays);

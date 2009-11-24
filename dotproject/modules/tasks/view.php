@@ -17,6 +17,7 @@ $msg = '';
 $canAccess = getPermission($m, 'access', $task_id);
 $canRead = getPermission($m, 'view', $task_id);
 $canEdit = getPermission($m, 'edit', $task_id);
+$canTaskLog = getPermission('task_log', 'add', $task_id);
 
 // check if this record has dependencies to prevent deletion
 $canDelete = $obj->canDelete($msg, $task_id);
@@ -144,9 +145,8 @@ function setCalendar(idate, fdate) {
 // security improvement:
 // some javascript functions may not appear on client side in case of user not having write permissions
 // else users would be able to arbitrarily run 'bad' functions
-if ($canEdit) {
+if ($canTaskLog) {
 ?>
-
 function updateTask() {
 	var f = document.editFrm;
 	if (f.task_log_description.value.length < 1) {
@@ -162,6 +162,15 @@ function updateTask() {
 		f.submit();
 	}
 }
+<?php } ?>
+
+<?php
+// security improvement:
+// some javascript functions may not appear on client side in case of user not having write permissions
+// else users would be able to arbitrarily run 'bad' functions
+if ($canEdit) {
+?>
+
 function delIt() {
 	if (confirm("<?php echo $AppUI->_('doDelete', UI_OUTPUT_JS).' '.$AppUI->_('Task', UI_OUTPUT_JS).'?';?>")) {
 		document.frmDelete.submit();
@@ -471,7 +480,7 @@ if ($obj->task_dynamic != 1) {
 		// fixed bug that dP automatically jumped to access denied if user does not
 		// have read-write permissions on task_id and this tab is opened by default (session_vars)
 		// only if user has r-w perms on this task, new or edit log is beign showed
-		if (getPermission('tasks', 'edit', $task_id)) {
+		if (getPermission('task_log', 'edit', $task_id) || getPermission('task_log', 'add', $task_id)) {
 			if ($task_log_id == 0) {
 				if (getPermission('task_log', 'add')) {
 					$tabBox->add(DP_BASE_DIR.'/modules/tasks/vw_log_update', 'New Log');

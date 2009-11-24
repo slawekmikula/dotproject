@@ -1,0 +1,20 @@
+##
+## DO NOT MODIFY THIS FILE BY HAND!
+##
+"Advanced search"=>"Zaawansowane wyszukiwanie",
+"All words"=>"Wszystkie słowa",
+"Display all fields"=>"Wyświetl wszystkie pola",
+"Empty"=>"Pusty",
+"Events"=>"Wydarzenia",
+"Files Content"=>"Zawartość plików",
+"Forum Messages"=>"Wiadomości forum",
+"Forum messages"=>"Wiadomości forum",
+"Ignore case"=>"Ignoruj wielkość liter",
+"Ignore special chars"=>"Ignoruj znaki specjalne",
+"Modules selection"=>"Wybór modułów",
+"Search"=>"Szukaj",
+"Select all"=>"Szukaj wszystko",
+"Show empty"=>"Pokazuj puste",
+"Task Log"=>"Log zadań",
+"Task logs"=>"Logi zadań",
+"Total records found"=>"Wszystkich rekordów znaleziono",

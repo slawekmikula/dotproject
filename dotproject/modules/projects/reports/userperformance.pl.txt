@@ -1,0 +1,2 @@
+Wydajność użytkowników
+Raport przedstawia wskaźnik wydajności bazujący na porównaniu ilości godzin przepracowanych z ustalonymi w zadaniu

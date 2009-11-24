@@ -24,3 +24,6 @@
 "Show all",
 "Tasks",
 "User",
+"Changes to",
+"User Administration",
+"Helpdesk",

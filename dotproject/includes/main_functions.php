@@ -959,10 +959,12 @@ function seems_utf8($Str) {
  */
 function safe_utf8_decode($string)
 {
-	if (seems_utf8($string)) {
-		return utf8_decode($string);
-	} else {
-		return $string;
-	}
+	return $string;
+// FIXME - strings in DB are utf-8 :/ - not needed ?
+//    if (seems_utf8($string)) {
+//		return utf8_decode($string);
+//	} else {
+//		return $string;
+//	}
 }
 ?>

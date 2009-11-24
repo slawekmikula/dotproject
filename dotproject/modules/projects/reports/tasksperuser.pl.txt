@@ -1,0 +1,3 @@
+Zadania dla użytkownika
+Raport przedstawia zadania przydzielone dla każdego użytkownika
+
