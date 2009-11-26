@@ -39,7 +39,6 @@ db_loadHash( $sql, $task );
 $is_new_record = !$tid;
 $task_found = $task['project_company']!=FALSE;
 $require_task_info = $is_new_record || $task_found;
-//echo '<pre>';print_r($task);echo '</pre>';
 
 Global $TIMECARD_CONFIG;
 //Prevent users from editing other ppls timecards.
@@ -64,7 +63,7 @@ if (isset( $task['task_log_date'] )) {
 
 // get user -> tasks
 $sql = "
-SELECT u.task_id, t.task_name, t.task_project,
+SELECT u.task_id, t.task_name, t.task_project, t.task_percent_complete,
 	p.project_name, p.project_company, c.company_name
 FROM user_tasks u, tasks t
 LEFT JOIN projects p ON p.project_id = t.task_project
@@ -73,9 +72,10 @@ WHERE u.user_id = $AppUI->user_id
 	AND u.task_id = t.task_id
 	AND t.task_dynamic = 0
     AND p.project_status != 7
+    AND t.task_status != -1
+    AND t.task_percent_complete != 100
 ORDER by p.project_name, t.task_name
 ";
-##echo "<pre>$sql</pre>";
 
 $res = db_exec( $sql );
 echo db_error();
@@ -83,18 +83,18 @@ $tasks = array();
 $projects = array();
 $companies = array( '0'=>'' );
 while ($row = db_fetch_assoc( $res )) {
-// collect tasks in js format
-	$tasks[] = "[".$row['task_project'].",".$row['task_id'].",'".addslashes($row['task_name'])."']";
-// collect projects in js format
+    // collect tasks in js format
+	$tasks[] = "[".$row['task_project'].",".$row['task_id'].",'".addslashes($row['task_name'])."','" . $row['task_percent_complete'] . "']";
+    // collect projects in js format
 	$projects[] = "[".$row['project_company'].",".$row['task_project'].",'".addslashes($row['project_name'])."']";
-// collect companies in normal format
+    // collect companies in normal format
 	$companies[$row['project_company']] = $row['company_name'];
 };
 
 if ($task_found)
 {
 	// need to add the entry for the task itself as that was not found
-	$tasks[$task['task_log_task']] = "[{$task['task_project']}, {$task['task_log_task']}, '{$task['task_name']}']";
+	$tasks[$task['task_log_task']] = "[{$task['task_project']}, {$task['task_log_task']}, '{$task['task_name']}', '{$task['task_percent_complete']}']";
 	// collect projects in js format
 	$projects[$task['task_project']] = "[{$task['project_company']},{$task['task_project']}, '{$task['project_name']}']";
 	// get the company name
@@ -193,6 +193,10 @@ function addToList( list, text, value ) {
 <?php } ?>
 }
 
+function selectInList(list, index) {
+    list[index].selected = "1";
+}
+
 function changeList( listName, source, target ) {
 	//alert(listName+','+source+','+target);return;
 	var f = document.AddEdit;
@@ -224,6 +228,16 @@ function selectList( listName, target ) {
 		}
 	}
 }
+
+function changeTaskPercent(task_index) {
+    var f = document.AddEdit;
+    var list = eval('f.task_percent_complete');
+    var index = tasks[task_index-1][3]/5;
+
+    list.options.selectedIndex = index;
+    //selectnList( list, index );
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 function submitIt() {
@@ -281,8 +295,11 @@ function delIt() {
 	}
 	else
 	{
-		//***MOD 20050525 pedroa echo "<input type='hidden' name='task_log_creator' value=".$AppUI->user_id."/>";
-		echo "<input type='hidden' name='task_log_creator' value=".$_GET['userid']."/>";
+        if (!$_GET['userid']) {
+            echo "<input type='hidden' name='task_log_creator' value=".$AppUI->user_id."/>";
+        } else {
+            echo "<input type='hidden' name='task_log_creator' value=".$_GET['userid']."/>";
+        }
 	}
 ?>
  
@@ -335,8 +352,36 @@ function delIt() {
 <tr>
 	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Task');?>:</td>
 	<td>
-		<select name="task_log_task" class="text" style="width:250px"></select>
+		<select name="task_log_task" class="text" style="width:250px" onchange="changeTaskPercent(this.options[this.selectedIndex].value)"></select>
 		<input type="hidden" name="task_log_name" value="">
+	</td>
+</tr>
+<tr>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Progress');?>:</td>
+	<td>
+		<select name="task_percent_complete" class="text" style="width:50px">
+            <option value="0" selected="selected">0</option>
+        	<option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+            <option value="35">35</option>
+            <option value="40">40</option>
+            <option value="45">45</option>
+            <option value="50">50</option>
+            <option value="55">55</option>
+            <option value="60">60</option>
+            <option value="65">65</option>
+            <option value="70">70</option>
+            <option value="75">75</option>
+            <option value="80">80</option>
+            <option value="85">85</option>
+            <option value="90">90</option>
+            <option value="95">95</option>
+            <option value="100">100</option>
+        </select>
 	</td>
 </tr>
 <?php

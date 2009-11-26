@@ -6,39 +6,15 @@
 //two characters, so lets unaccent them, other languages should add to the replacements array too...
 
 function cleanText($text){
-/*
-	//This text file is not utf, its iso so we have to decode/encode
 	$text = safe_utf8_decode($text);
-	$trade = array('?E=>'a','?E=>'a','?E=>'a',
-                 '?E=>'a','?E=>'a',
-                 '�'=>'A','�'=>'A','�'=>'A',
-                 '�'=>'A','�'=>'A',
-                 '?E=>'e','?E=>'e',
-                 '?E=>'e','?E=>'e',
-                 '�'=>'E','�'=>'E',
-                 '�'=>'E','�'=>'E',
-                 '?E=>'i','?E=>'i',
-                 '?E=>'i','?E=>'i',
-                 '�'=>'I','�'=>'I',
-                 '�'=>'I','�'=>'I',
-                 '?E=>'o','?E=>'o','?E=>'o',
-                 '?E=>'o','?E=>'o',
-                 '�'=>'O','�'=>'O','�'=>'O',
-                 '�'=>'O','�'=>'O',
-                 '?E=>'u','?E=>'u',
-                 '?E=>'u','?E=>'u',
-                 '�'=>'U','�'=>'U',
-                 '�'=>'U','�'=>'U',
-                 '�'=>'N','?E=>'n');
-    $text = strtr($text,$trade);
-	$text = utf8_encode($text);
-*/
 	return $text;
 }
 
 require_once( $AppUI->getModuleClass( 'tasks' ) );
 
 $del = dPgetParam( $_POST, 'del', 0 );
+$task_id = dPgetParam( $_POST, 'task_log_task', 0 );
+$task_percent_complete = dPgetParam( $_POST, 'task_percent_complete', 0 );
 
 $obj = new CTaskLog();
 
@@ -67,12 +43,19 @@ if ($del) {
 		$AppUI->setMsg( $msg, UI_MSG_ERROR );
 		$AppUI->redirect();
 	} else {
+        // update task percent complete
+        $task = new CTask();
+
+        if ($task_id) {
+            $task->load($task_id);
+            $task->task_percent_complete = $task_percent_complete;
+            $task->store();
+        }
+
 		$AppUI->setMsg( @$_POST['task_log_id'] ? 'updated' : 'inserted', UI_MSG_OK, true );
 		$AppUI->redirect("m=timecard&tab=0");
 	}
 }
-
-//echo '<pre>';print_r($obj);echo '</pre>';
 
 $AppUI->redirect();
 ?>

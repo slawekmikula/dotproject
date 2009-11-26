@@ -17,11 +17,10 @@ if (isset( $_GET['tab'] ))
 $tab = $AppUI->getState( 'ProjIdxTab' ) !== NULL ? $AppUI->getState( 'ProjIdxTab' ) : 0;
 
 // Create module header
-?><table width="100%" border="0" cellpadding="3" cellspacing="1">
-<tr valign="top">
-<td width="32"><img src="./images/calendar2.gif" title="Holidays" border="0" height="24" width="24"></td>
-<td nowrap><h1><?php echo $AppUI->_('Holidays');?></h1></td>
-</table>
+$titleBlock = new CTitleBlock('Holidays', 'calendar.gif', $m, "$m.$a");
+$titleBlock->show();
+?>
+
 
 <?php
 // tabbed information boxes

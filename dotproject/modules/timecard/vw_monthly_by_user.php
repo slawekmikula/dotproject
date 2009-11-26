@@ -31,7 +31,7 @@
     $end_report->addDays(-1);
 
 	//Get hash of users
-	$sql = "SELECT user_id, contact_email, concat(contact_first_name,' ',contact_last_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_first_name, contact_last_name;";
+	$sql = "SELECT user_id, contact_email, concat(contact_last_name,' ',contact_first_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_last_name, contact_first_name;";
 	$result = db_loadList($sql);	
 	$people = array();
 
@@ -80,6 +80,7 @@
         foreach($result as $row){
             $date_insert = new CDate($row['task_log_date']);
             $projects_hours[$id][$date_insert->format('%Y-%m-%d')] = $row['sum'];
+            $user_by_day[$date_insert->format('%Y-%m-%d')] += $projects_hours[$id][$date_insert->format('%Y-%m-%d')];
         }
         unset($result);
 
@@ -109,10 +110,12 @@
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
         <?php if($show_other_worksheets){ ?>
+        <td><?php echo $AppUI->_('User'); ?>:</td>
 		<td width="1%" valign="top" nowrap="nowrap">
         <?php echo arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $user_id )?>
         </td>
         <?php } ?>
+        <td><?php echo $AppUI->_('Date'); ?></td>
 		<td width="98%" align="left" valign="top">
         <?php echo arraySelect( $months, 'month', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $month )?>
 		</td>
@@ -124,14 +127,13 @@
     <th width="150px"><?php echo $AppUI->_('Project')?></th>
     <th width="50px"><?php echo $AppUI->_('Days:')?></th>
 <?php
-    # fixme - dni w danym miesiącu
 	for($i=1;$i<=$start_report->getDaysInMonth();$i++){
 ?>
 	<th width="20px"><?php echo $i?></th>
 <?php
 	}
 ?>
-    <th width="50px"><?php echo $AppUI->_('Total:')?></th>
+    <th width="50px"><?php echo $AppUI->_('Total')?>:</th>
 </tr>
 
 <?php
@@ -153,13 +155,13 @@
     <?php
     } else {
     ?>
-        <td style="background:#CCCCCC;text-align:center;" align="right">
+        <td style="background:#EF95CB;text-align:center;" align="right">
     <?php
     }
 ?>	
         <?php
             if (isset($projects_hours[$id][$date->format('%Y-%m-%d')])) {
-                echo $projects_hours[$id][$date->format('%Y-%m-%d')];
+                printf("%.1f",$projects_hours[$id][$date->format('%Y-%m-%d')]);
                 $sum_project += $projects_hours[$id][$date->format('%Y-%m-%d')];
             }
             $date->addDays(1);
@@ -168,22 +170,25 @@
 <?php
 	}
 ?>
-    <td style="text-align:center;"><strong><?php echo $sum_project; ?></strong></td>
+    <td style="text-align:center;"><strong><?php printf("%.1f",$sum_project); ?></strong></td>
 </tr>
 <?php
     $total_sum += $sum_project;
     }
 ?>
     <tr>
+        <td>&nbsp;</th>
+        <td style="text-align:center; font-weight:bold;"><?php echo $AppUI->_('Total'); ?>:</td>
 <?php
-    # fixme - dni w danym miesiącu
-	for($i=1;$i<=$start_report->getDaysInMonth()+2;$i++){
+    $date = new CDate($start_report);
+	for($i=1;$i<=$start_report->getDaysInMonth();$i++){
 ?>
-	<td>&nbsp;</th>
+	<td style="text-align:center; font-weight:bold; "><?php echo sprintf("%.1f",$user_by_day[$date->format('%Y-%m-%d')]); ?></td>
 <?php
+        $date->addDays(1);
 	}
 ?>
-    <td style="text-align:center;"><strong> <?php echo $total_sum ?></strong></td>
+    <td style="text-align:center;"><strong> <?php echo sprintf("%.1f",$total_sum); ?></strong></td>
     </tr>
 </table>
 	

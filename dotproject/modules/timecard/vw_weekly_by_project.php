@@ -78,9 +78,7 @@
 	$end_day -> setDate($date, DATE_FORMAT_ISO);
 
 	//Get hash of users
-//Pedro A.
-	$sql = "SELECT user_id, contact_email, concat(contact_first_name,' ',contact_last_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_first_name, contact_last_name;";
-//End Pedro A.
+	$sql = "SELECT user_id, contact_email, concat(contact_last_name,' ',contact_first_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_last_name, contact_first_name;";
 	$result = db_loadList($sql);	
 	$people = array();
 
@@ -119,7 +117,6 @@
 	
 	$sql .= " ORDER BY project_name";
 
-//	print "<pre>$sql</pre>";
 	$result = db_loadList($sql);
 
 

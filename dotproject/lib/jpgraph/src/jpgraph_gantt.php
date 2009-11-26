@@ -3,8 +3,7 @@
 // File:	JPGRAPH_GANTT.PHP
 // Description:	JpGraph Gantt plot extension
 // Created: 	2001-11-12
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id$
+// Ver:		$Id: jpgraph_gantt.php 955 2007-11-17 11:41:42Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -12,7 +11,7 @@
 
 require_once('jpgraph_plotband.php'); 
 require_once('jpgraph_iconplot.php'); 
-require_once('jpgraph_plotmark.inc');
+require_once('jpgraph_plotmark.inc.php');
 
 // Maximum size for Automatic Gantt chart
 DEFINE('MAX_GANTTIMG_SIZE_W',4000);
@@ -847,14 +846,12 @@ class GanttGraph extends Graph {
 		}
 	    }
 
-	    // Has the user specified a width or do we need to
-	    // determine it?
+	    $cw = $this->GetMaxActInfoColWidth() ;
+	    $this->scale->actinfo->SetMinColWidth($cw); 
 	    if( $this->img->width <= 0 ) {
 		// Now determine the width for the activity titles column
 
 		// Firdst find out the maximum width of each object column
-		$cw = $this->GetMaxActInfoColWidth() ;
-		$this->scale->actinfo->SetMinColWidth($cw); 
 		$titlewidth = max(max($this->GetMaxLabelWidth(),
 				      $this->scale->tableTitle->GetWidth($this->img)), 
 				  $this->scale->actinfo->GetWidth($this->img));
@@ -868,8 +865,9 @@ class GanttGraph extends Graph {
 		// into account
 		$width = $titlewidth + $nd*$fw + $lm+$rm;
 	    }
-	    else
+	    else {
 		$width = $this->img->width;
+	    }
 
 	    $width = round($width);
 	    $height = round($height);
@@ -1506,7 +1504,7 @@ class TextProperty {
     var $iShow=true;
     var $iText="";
     var $iHAlign="left",$iVAlign="bottom";
-    var $csimtarget='',$csimalt='';
+    var $csimtarget='',$csimwintarget='',$csimalt='';
 	
 //---------------
 // CONSTRUCTOR	
@@ -1520,13 +1518,19 @@ class TextProperty {
 	$this->iText = $aTxt;
     }
 
-    function SetCSIMTarget($aTarget,$aAltText='') {
+    function SetCSIMTarget($aTarget,$aAltText='',$aWinTarget='') {
 	if( is_string($aTarget) )
 	    $aTarget = array($aTarget);
 	$this->csimtarget=$aTarget;
+
+	if( is_string($aWinTarget) )
+	    $aWinTarget = array($aWinTarget);
+	$this->csimwintarget=$aWinTarget;
+
 	if( is_string($aAltText) )
 	    $aAltText = array($aAltText);
         $this->csimalt=$aAltText;
+	
     }
     
     function SetCSIMAlt($aAltText) {
@@ -1592,7 +1596,8 @@ class TextProperty {
 	    if( strlen($this->iText) == 0 ) return 0;
 	    $tmp = split("\t",$this->iText);
 	    if( count($tmp) <= 1 || !$aUseTabs ) {
-		return $aImg->GetTextWidth($this->iText)+2*$extra_margin;
+		$w = $aImg->GetTextWidth($this->iText);
+		return $w + 2*$extra_margin;
 	    }
 	    else {
 		$tot=0;
@@ -1683,8 +1688,7 @@ class TextProperty {
 		    if( is_array($aY) ) $aY=$aY[0];
 		    $aImg->StrokeText($aX,$aY,str_replace("\t"," ",$this->iText));
 		}
-		else {
-		    $n = count($this->iText);
+		elseif( is_array($this->iText) && ($n = count($this->iText)) > 0 ) {
 		    $ax = is_array($aX) ;
 		    $ay = is_array($aY) ;
 		    if( $ax && $ay ) {
@@ -2935,7 +2939,7 @@ class GanttPlotObject {
     var $iStart="";				// Start date
     var $title,$caption;
     var $iCaptionMargin=5;
-    var $csimarea='',$csimtarget='',$csimalt='';
+    var $csimarea='',$csimtarget='',$csimwintarget='',$csimalt='';
 
     var $constraints = array();    
     var $iConstrainPos=array();
@@ -2950,7 +2954,7 @@ class GanttPlotObject {
 	return $this->csimarea;
     }
 
-    function SetCSIMTarget($aTarget,$aAlt='') {
+    function SetCSIMTarget($aTarget,$aAlt='',$aWinTarget='') {
 	if( !is_string($aTarget) ) {
 	    $tv = substr(var_export($aTarget,true),0,40);
 	    JpGraphError::RaiseL(6024,$tv);
@@ -2963,6 +2967,7 @@ class GanttPlotObject {
 	}
 
         $this->csimtarget=$aTarget;
+        $this->csimwintarget=$aWinTarget;
         $this->csimalt=$aAlt;
     }
     
@@ -3259,12 +3264,20 @@ class GanttBar extends GanttPlotObject {
 		$title_xt = $colstarts[$i];
 		$title_xb = $title_xt + $colwidth[$i];
 		$coords = "$title_xt,$yt,$title_xb,$yt,$title_xb,$yb,$title_xt,$yb";
-		$this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->title->csimtarget[$i]."\"";
-		if( ! empty($this->title->csimalt[$i]) ) {
-		    $tmp = $this->title->csimalt[$i];
-		    $this->csimarea .= " title=\"$tmp\"";
+
+		if( ! empty($this->title->csimtarget[$i]) ) {
+		    $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->title->csimtarget[$i]."\"";
+
+		    if( ! empty($this->title->csimwintarget[$i]) ) {
+			$this->csimarea .= "target=\"".$this->title->csimwintarget[$i]."\" ";
+		    }
+		    
+		    if( ! empty($this->title->csimalt[$i]) ) {
+			$tmp = $this->title->csimalt[$i];
+			$this->csimarea .= " title=\"$tmp\" alt=\"$tmp\" ";
+		    }
+		    $this->csimarea .= " />\n";
 		}
-		$this->csimarea .= " alt=\"$tmp\" />\n";
 	    }
 	}
 
@@ -3292,16 +3305,20 @@ class GanttBar extends GanttPlotObject {
 	}
 
 	// CSIM for bar
-	if( $this->csimtarget != '' ) {
+	if( ! empty($this->csimtarget) ) {
 
 	    $coords = "$xt,$yt,$xb,$yt,$xb,$yb,$xt,$yb";
-	    $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".
-		              $this->csimtarget."\"";
+	    $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->csimtarget."\"";
+	    
+	    if( !empty($this->csimwintarget) ) {
+		$this->csimarea .= " target=\"".$this->csimwintarget."\" ";
+	    }
+
 	    if( $this->csimalt != '' ) {
 		$tmp = $this->csimalt;
-		$this->csimarea .= " title=\"$tmp\"";
+		$this->csimarea .= " title=\"$tmp\" alt=\"$tmp\" ";
 	    }
-	    $this->csimarea .= " alt=\"$tmp\" />\n";
+	    $this->csimarea .= "  />\n";
 	}
 
 	// Draw progress bar inside activity bar
@@ -3312,15 +3329,20 @@ class GanttBar extends GanttPlotObject {
 	    $len = ($xbp-$xtp)*$this->progress->iProgress;
 
 	    $endpos = $xtp+$len;
+	    
+	    // Is the the progress bar visible after the start date?
 	    if( $endpos > $xt ) {
+
+		// Take away the length of the progress that is not visible (before the start date)
 		$len -= ($xt-$xtp); 
 
-		// Make sure that the progess bar doesn't extend over the end date
-		if( $xtp+$len-1 > $xb )
-		    $len = $xb - $xtp + 1;
-		
+		// Is the the progress bar visible after the start date?
 		if( $xtp < $xt ) 
 		    $xtp = $xt;
+		
+		// Make sure that the progess bar doesn't extend over the end date
+		if( $xtp+$len-1 > $xb )
+		    $len = $xb - $xtp  ;
 		
 		$prog = $factory->Create($this->progress->iPattern,$this->progress->iColor);
 		$prog->SetDensity($this->progress->iDensity);
@@ -3419,12 +3441,22 @@ class MileStone extends GanttPlotObject {
 		$title_xt = $colstarts[$i];
 		$title_xb = $title_xt + $colwidth[$i];
 		$coords = "$title_xt,$yt,$title_xb,$yt,$title_xb,$yb,$title_xt,$yb";
-		$this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->title->csimtarget[$i]."\"";
-		if( ! empty($this->title->csimalt[$i]) ) {
-		    $tmp = $this->title->csimalt[$i];
-		    $this->csimarea .= " title=\"$tmp\"";
+		
+		if( !empty($this->title->csimtarget[$i]) ) {
+
+		    $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->title->csimtarget[$i]."\"";
+
+		    if( !empty($this->title->csimwintarget[$i]) ) {
+			$this->csimarea .= "target=\"".$this->title->csimwintarget[$i]."\"";
+		    }
+
+		    if( ! empty($this->title->csimalt[$i]) ) {
+			$tmp = $this->title->csimalt[$i];
+			$this->csimarea .= " title=\"$tmp\" alt=\"$tmp\" ";
+		    }
+		    $this->csimarea .= " />\n";
+
 		}
-		$this->csimarea .= " alt=\"$tmp\" />\n";
 	    }
 	}
 

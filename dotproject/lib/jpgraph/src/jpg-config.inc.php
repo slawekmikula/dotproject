@@ -3,8 +3,7 @@
 // File:	JPG-CONFIG.INC
 // Description:	Configuration file for JpGraph library
 // Created: 	2004-03-27
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id$
+// Ver:		$Id: jpg-config.inc.php 852 2007-03-18 18:18:35Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -62,15 +61,14 @@ DEFINE("CSIMCACHE_HTTP_DIR","csimcache/");
 // Actual name of the TTF file used together with FF_CHINESE aka FF_BIG5
 // This is the TTF file being used when the font family is specified as
 // either FF_CHINESE or FF_BIG5
-define('TTF_DIR', DP_BASE_DIR . '/lib/fonts/');
-define('FF_CUSTOM', 18);
-define('BASE_FONT', 'Arial');
-define('CUSTOM_TTF_FONT', BASE_FONT . '.ttf');
-define('CUSTOM_TTF_FONT_BOLD', BASE_FONT.'Bold.ttf');
-define('CUSTOM_TTF_FONT_ITALIC', BASE_FONT.'Oblique.ttf');
-define('CUSTOM_TTF_FONT_BOLDITALIC', BASE_FONT.'BoldOblique.ttf');
-
 DEFINE('CHINESE_TTF_FONT','bkai00mp.ttf');
+
+// Special unicode greek language support
+DEFINE("LANGUAGE_GREEK",false);
+
+// If you are setting this config to true the conversion of greek characters
+// will assume that the input text is windows 1251 
+DEFINE("GREEK_FROM_WINDOWS",false);
 
 // Special unicode cyrillic language support
 DEFINE("LANGUAGE_CYRILLIC",false);
@@ -81,30 +79,31 @@ DEFINE("LANGUAGE_CYRILLIC",false);
 DEFINE("CYRILLIC_FROM_WINDOWS",false);
 
 // The following constant is used to auto-detect
-// whether cyrillic conversion is really necessary 
-// if enabled. Just replace 'windows-1251' with a variable 
-// containing the input character encoding string 
+// whether cyrillic conversion is really necessary
+// if enabled. Just replace 'windows-1251' with a variable
+// containing the input character encoding string
 // of your application calling jpgraph.
-// A typical such string would be 'UTF-8' or 'utf-8'. 
+// A typical such string would be 'UTF-8' or 'utf-8'.
 // The comparison is case-insensitive.
 // If this charset is not a 'koi8-r' or 'windows-1251'
 // derivate then no conversion is done.
 //
 // This constant can be very important in multi-user
 // multi-language environments where a cyrillic conversion
-// could be needed for some cyrillic people 
-// and resulting in just erraneous conversions 
+// could be needed for some cyrillic people
+// and resulting in just erraneous conversions
 // for not-cyrillic language based people.
 //
 // Example: In the free project management
 // software dotproject.net $locale_char_set is dynamically
 // set by the language environment the user has chosen.
 //
-// Usage:  DEFINE('LANGUAGE_CHARSET', $locale_char_set);
+// Usage: DEFINE('LANGUAGE_CHARSET', $locale_char_set);
 //
 // where $locale_char_set is a GLOBAL (string) variable
 // from the application including JpGraph.
-DEFINE('LANGUAGE_CHARSET', $locale_char_set);
+// 
+DEFINE('CYRILLIC_LANGUAGE_CHARSET', null);
 
 // Japanese TrueType font used with FF_MINCHO, FF_PMINCHO, FF_GOTHIC, FF_PGOTHIC
 DEFINE('MINCHO_TTF_FONT','ipam.ttf');
@@ -112,32 +111,34 @@ DEFINE('PMINCHO_TTF_FONT','ipamp.ttf');
 DEFINE('GOTHIC_TTF_FONT','ipag.ttf');
 DEFINE('PGOTHIC_TTF_FONT','ipagp.ttf');
 
+// Assume that Japanese text have been entered in EUC-JP encoding.
+// If this define is true then conversion from EUC-JP to UTF8 is done 
+// automatically in the library using the mbstring module in PHP.
+DEFINE('ASSUME_EUCJP_ENCODING',false);
+
+define('TTF_DIR', DP_BASE_DIR . '/lib/fonts/');
+define('FF_CUSTOM', 18);
+define('BASE_FONT', 'Arial');
+define('CUSTOM_TTF_FONT', BASE_FONT . '.ttf');
+define('CUSTOM_TTF_FONT_BOLD', BASE_FONT.'Bold.ttf');
+define('CUSTOM_TTF_FONT_ITALIC', BASE_FONT.'Oblique.ttf');
+define('CUSTOM_TTF_FONT_BOLDITALIC', BASE_FONT.'BoldOblique.ttf');
+
+
 //------------------------------------------------------------------------
 // Various JpGraph Settings. Adjust accordingly to your
 // preferences. Note that cache functionality is turned off by
 // default (Enable by setting USE_CACHE to true)
 //------------------------------------------------------------------------
 
+// Deafult locale for error messages.
+// This defaults to English = 'en'
+DEFINE('DEFAULT_ERR_LOCALE','en');
+
 // Deafult graphic format set to "auto" which will automatically
 // choose the best available format in the order png,gif,jpeg
 // (The supported format depends on what your PHP installation supports)
 DEFINE("DEFAULT_GFORMAT","auto");
-
-// Should the image be a truecolor image? 
-// Note 1: Has only effect with GD 2.0.1 and above.
-// Note 2: GD 2.0.1 + PHP 4.0.6 on Win32 crashes when trying to use 
-// trucolor.
-// Note 3: MUST be enabled to get background images working with GD2
-DEFINE('USE_TRUECOLOR',true);
-
-// Specify what version of the GD library is installed.
-// If this is set to 'auto' the version will be automatically 
-// determined.
-// However since determining the library takes ~1ms you can also 
-// manually specify the version if you know what version you have. 
-// This means that you should 
-// set this define to true if you have GD 2.x installed to save 1ms. 
-DEFINE("USE_LIBRARY_GD2",'auto');
 
 // Should the cache be used at all? By setting this to false no
 // files will be generated in the cache directory.  
@@ -171,17 +172,6 @@ DEFINE("INSTALL_PHP_ERR_HANDLER",false);
 // in the graph not being created and just a "red-cross" image would be seen.
 // This should be turned off for a production site.
 DEFINE("CATCH_PHPERRMSG",true);
-
-// If the color palette is full should JpGraph try to allocate
-// the closest match? If you plan on using background images or
-// gradient fills it might be a good idea to enable this.
-// If not you will otherwise get an error saying that the color palette is 
-// exhausted. The drawback of using approximations is that the colors 
-// might not be exactly what you specified. 
-// Note1: This does only apply to paletted images, not truecolor 
-// images since they don't have the limitations of maximum number
-// of colors.
-DEFINE("USE_APPROX_COLORS",true);
 
 // Should usage of deprecated functions and parameters give a fatal error?
 // (Useful to check if code is future proof.)

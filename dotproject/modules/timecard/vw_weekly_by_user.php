@@ -50,7 +50,7 @@
 	$sql = "
 		SELECT 
 			user_id,
-			concat(contact_first_name,' ',contact_last_name) as name,
+			concat(contact_last_name,' ',contact_first_name) as name,
 			contact_email,
 			company_name
 		FROM 
@@ -65,7 +65,7 @@
 		$sql .= " AND contacts.contact_company = $company_id";
 	}
 	
-	$sql .= " ORDER BY contact_first_name, contact_last_name";
+	$sql .= " ORDER BY contact_last_name, contact_first_name";
 
 	//print "<pre>$sql</pre>";
 	$result = db_loadList($sql);

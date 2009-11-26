@@ -45,7 +45,7 @@ while ($row = db_fetch_assoc( $prc )) {
 </table>
 <table width="100%" border="0" cellpadding="3" cellspacing="1">
         <tr valign="top">
-                <td align="left">Blacklist items allows you to ignore holidays not viable in your region</td>
+                <td align="left"><?php echo $AppUI->_('Blacklist items allows you to ignore holidays not viable in your region'); ?></td>
                 <td align="right"><input class="button" type="button" value="<?php echo $AppUI->_('Add workday');?>" onclick="window.location='?m=holiday&a=addedit&white=0&'"></td>
         </tr>
 </table>

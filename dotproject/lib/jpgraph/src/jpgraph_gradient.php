@@ -3,8 +3,7 @@
 // File:	JPGRAPH_GRADIENT.PHP
 // Description:	Create a color gradient
 // Created: 	2003-02-01
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_gradient.php 501 2006-02-04 12:45:44Z ljp $
+// Ver:		$Id: jpgraph_gradient.php 946 2007-10-19 22:14:00Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -22,7 +21,7 @@ DEFINE("GRAD_WIDE_MIDHOR",7);
 DEFINE("GRAD_LEFT_REFLECTION",8);
 DEFINE("GRAD_RIGHT_REFLECTION",9);
 DEFINE("GRAD_RAISED_PANEL",10);
-
+DEFINE("GRAD_DIAGONAL",11);
   
 //===================================================
 // CLASS Gradient
@@ -54,7 +53,7 @@ class Gradient {
     function FilledRectangle($xl,$yt,$xr,$yb,$from_color,$to_color,$style=1) {
 	switch( $style ) {	
 	    case GRAD_VER:  
-		$steps = round(abs($xr-$xl));
+		$steps = ceil(abs($xr-$xl));
 		$delta = $xr>=$xl ? 1 : -1;
 		$this->GetColArray($from_color,$to_color,$steps,$colors,$this->numcolors);
 		for( $i=0, $x=$xl; $i < $steps; ++$i ) {
@@ -65,7 +64,7 @@ class Gradient {
 		break;
 
 	    case GRAD_HOR: 
-		$steps = round(abs($yb-$yt));
+		$steps = ceil(abs($yb-$yt));
 		$delta = $yb>=$yt ? 1 : -1;
 		$this->GetColArray($from_color,$to_color,$steps,$colors,$this->numcolors);
 		for($i=0,$y=$yt; $i < $steps; ++$i) {
@@ -76,7 +75,7 @@ class Gradient {
 		break;
 
 	    case GRAD_MIDHOR: 
-		$steps = round(abs($yb-$yt)/2);
+		$steps = ceil(abs($yb-$yt)/2);
 		$delta = $yb >= $yt ? 1 : -1;
 		$this->GetColArray($from_color,$to_color,$steps,$colors,$this->numcolors);
 		for($y=$yt, $i=0; $i < $steps;  ++$i) {
@@ -95,7 +94,7 @@ class Gradient {
 		break;
 
 	    case GRAD_MIDVER: 
-		$steps = round(abs($xr-$xl)/2);
+		$steps = ceil(abs($xr-$xl)/2);
 		$delta = $xr>=$xl ? 1 : -1;
 		$this->GetColArray($from_color,$to_color,$steps,$colors,$this->numcolors);
 		for($x=$xl, $i=0; $i < $steps; ++$i) {
@@ -114,7 +113,7 @@ class Gradient {
 		break;
 
 	    case GRAD_WIDE_MIDVER: 
-		$diff = round(abs($xr-$xl));
+		$diff = ceil(abs($xr-$xl));
 		$steps = floor(abs($diff)/3);
 		$firststep = $diff - 2*$steps ; 
 		$delta = $xr >= $xl ? 1 : -1;
@@ -139,7 +138,7 @@ class Gradient {
 		break;
 
 	    case GRAD_WIDE_MIDHOR:
-		$diff = round(abs($yb-$yt));
+		$diff = ceil(abs($yb-$yt));
 		$steps = floor(abs($diff)/3);
 		$firststep = $diff - 2*$steps ; 
 		$delta = $yb >= $yt? 1 : -1;
@@ -163,7 +162,7 @@ class Gradient {
 		break;	    
 
 	    case GRAD_LEFT_REFLECTION: 
-		$steps1 = round(0.3*abs($xr-$xl));
+		$steps1 = ceil(0.3*abs($xr-$xl));
 		$delta = $xr>=$xl ? 1 : -1;		
 
 		$from_color = $this->img->rgb->Color($from_color);
@@ -196,7 +195,7 @@ class Gradient {
 		break;
 
 	    case GRAD_RIGHT_REFLECTION: 
-		$steps1 = round(0.7*abs($xr-$xl));
+		$steps1 = ceil(0.7*abs($xr-$xl));
 		$delta = $xr>=$xl ? 1 : -1;
 
 		$this->GetColArray($from_color,$to_color,$steps1,$colors,$this->numcolors);
@@ -269,6 +268,54 @@ class Gradient {
 		} 
 		break;
 
+	    case GRAD_DIAGONAL:
+		// use the longer dimension to determine the required number of steps.
+		// first loop draws from one corner to the mid-diagonal and the second
+		// loop draws from the mid-diagonal to the opposing corner.
+		if($xr-$xl > $yb - $yt) {
+		    // width is greater than height -> use x-dimension for steps
+		    $steps = $xr-$xl;
+		    $delta = $xr>=$xl ? 1 : -1;
+		    $this->GetColArray($from_color,$to_color,$steps*2,$colors,$this->numcolors);
+		    $n = count($colors);
+
+		    for($x=$xl, $i=0; $i < $steps && $i < $n; ++$i) {
+			$this->img->current_color = $colors[$i];
+			$y = $yt+($i/$steps)*($yb-$yt)*$delta;
+			$this->img->Line($x,$yt,$xl,$y);
+			$x += $delta;
+		    }
+
+		    for($x=$xl, $i = 0; $i < $steps && $i < $n; ++$i) {
+			$this->img->current_color = $colors[$steps+$i];
+			$y = $yt+($i/$steps)*($yb-$yt)*$delta;
+			$this->img->Line($x,$yb,$xr,$y);
+			$x += $delta;
+		    }
+		} else {
+		    // height is greater than width -> use y-dimension for steps
+		    $steps = $yb-$yt;
+		    $delta = $yb>=$yt ? 1 : -1;
+		    $this->GetColArray($from_color,$to_color,$steps*2,$colors,$this->numcolors);
+		    $n = count($colors);
+		    
+		    for($y=$yt, $i=0; $i < $steps && $i < $n; ++$i) {
+			$this->img->current_color = $colors[$i];
+			$x = $xl+($i/$steps)*($xr-$xl)*$delta;
+			$this->img->Line($x,$yt,$xl,$y);
+			$y += $delta;
+		    }
+
+		    for($y=$yt, $i = 0; $i < $steps && $i < $n; ++$i) {
+			$this->img->current_color = $colors[$steps+$i];
+			$x = $xl+($i/$steps)*($xr-$xl)*$delta;
+			$this->img->Line($x,$yb,$xr,$y);
+			$x += $delta;
+		    }
+
+		}
+		break;
+
 	    default:
 		JpGraphError::RaiseL(7001,$style);
 //("Unknown gradient style (=$style).");
@@ -288,8 +335,8 @@ class Gradient {
 	$miny=$pts[1];		
 	$n = count($pts) ;
 	for( $i=0, $idx=0; $i < $n; $i += 2) {
-	    $x = round($pts[$i]);
-	    $y = round($pts[$i+1]);
+	    $x = floor($pts[$i]);
+	    $y = floor($pts[$i+1]);
 	    $miny = min($miny,$y);
 	    $maxy = max($maxy,$y);
 	}
@@ -318,7 +365,7 @@ class Gradient {
 	    // Fill the rest using lines (slow...)
 	    $slope = ($p2[0]-$p1[0])/($p1[1]-$p2[1]);
 	    $x1 = $p1[0];
-	    $x2 = $p2[0]; //-1;
+	    $x2 = $p2[0]-1;
 	    $start = $y;
 	    if( $p1[1] > $p2[1] ) {
 		while( $y >= $p2[1] ) {

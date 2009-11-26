@@ -3,8 +3,7 @@
 // File:	JPGRAPH_PLOTMARK.PHP
 // Description:	Class file. Handles plotmarks
 // Created: 	2003-03-21
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_plotmark.inc 485 2006-02-04 12:20:45Z ljp $
+// Ver:		$Id: jpgraph_plotmark.inc.php 955 2007-11-17 11:41:42Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -75,7 +74,7 @@ class PlotMark {
     var $title, $show=true;
     var $type,$weight=1;
     var $color="black", $width=4, $fill_color="blue";
-    var $yvalue,$xvalue='',$csimtarget,$csimalt,$csimareas;
+    var $yvalue,$xvalue='',$csimtarget='',$csimwintarget='',$csimalt='',$csimareas;
     var $iFormatCallback="";
     var $iFormatCallback2="";
     var $markimg='',$iScale=1.0;
@@ -93,7 +92,6 @@ class PlotMark {
 	$this->title = new Text();
 	$this->title->Hide();
 	$this->csimareas = '';
-	$this->csimalt = '';
 	$this->type=-1;
     }
 //---------------
@@ -168,8 +166,9 @@ class PlotMark {
         $this->xvalue=$aX; 
     }
     
-    function SetCSIMTarget($aTarget) {
+    function SetCSIMTarget($aTarget,$aWinTarget='') {
         $this->csimtarget=$aTarget;
+        $this->csimwintarget=$aWinTarget;
     }
     
     function SetCSIMAlt($aAlt) {
@@ -188,12 +187,17 @@ class PlotMark {
         }
         $this->csimareas="";    
         if( !empty($this->csimtarget) ) {
-	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->csimtarget."\"";
+	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".htmlentities($this->csimtarget)."\"";
+
+	    if( !empty($this->csimwintarget) ) {
+		$this->csimareas .= " target=\"".$this->csimwintarget."\" ";
+	    }
+
 	    if( !empty($this->csimalt) ) {										
 		$tmp=sprintf($this->csimalt,$this->yvalue,$this->xvalue);
-		$this->csimareas .= " title=\"$tmp\"";
+		$this->csimareas .= " title=\"$tmp\" alt=\"$tmp\" ";
 	    }
-	    $this->csimareas .= " alt=\"$tmp\" />\n";
+	    $this->csimareas .= " />\n";
 	}
     }
     
@@ -201,12 +205,17 @@ class PlotMark {
     	$x = round($x); $y=round($y); $r=round($r);
         $this->csimareas="";    
         if( !empty($this->csimtarget) ) {
-	    $this->csimareas .= "<area shape=\"circle\" coords=\"$x,$y,$r\" href=\"".$this->csimtarget."\"";
+	    $this->csimareas .= "<area shape=\"circle\" coords=\"$x,$y,$r\" href=\"".htmlentities($this->csimtarget)."\"";
+
+	    if( !empty($this->csimwintarget) ) {
+		$this->csimareas .= " target=\"".$this->csimwintarget."\" ";
+	    }
+
     	    if( !empty($this->csimalt) ) {										
 		$tmp=sprintf($this->csimalt,$this->yvalue,$this->xvalue);
-		$this->csimareas .= " title=\"$tmp\"";
+		$this->csimareas .= " title=\"$tmp\" alt=\"$tmp\" ";
 	    }
-            $this->csimareas .= " alt=\"$tmp\" />\n";        
+            $this->csimareas .= " />\n";        
         }
     }
     	
@@ -271,7 +280,7 @@ class PlotMark {
 		case MARK_IMG_SPUSHPIN:
 		case MARK_IMG_LPUSHPIN:
 		    if( $this->imgdata_pushpins == null ) {
-			require_once 'imgdata_pushpins.inc';
+			require_once 'imgdata_pushpins.inc.php';
 			$this->imgdata_pushpins = new ImgData_PushPins();
 		    }
 		    $this->markimg = $this->imgdata_pushpins->GetImg($this->type,$filename);
@@ -280,7 +289,7 @@ class PlotMark {
 
 		case MARK_IMG_SQUARE:
 		    if( $this->imgdata_squares == null ) {
-			require_once 'imgdata_squares.inc';
+			require_once 'imgdata_squares.inc.php';
 			$this->imgdata_squares = new ImgData_Squares();
 		    }
 		    $this->markimg = $this->imgdata_squares->GetImg($this->type,$filename);
@@ -289,7 +298,7 @@ class PlotMark {
 
 		case MARK_IMG_STAR:
 		    if( $this->imgdata_stars == null ) {
-			require_once 'imgdata_stars.inc';
+			require_once 'imgdata_stars.inc.php';
 			$this->imgdata_stars = new ImgData_Stars();
 		    }
 		    $this->markimg = $this->imgdata_stars->GetImg($this->type,$filename);
@@ -298,7 +307,7 @@ class PlotMark {
 
 		case MARK_IMG_BEVEL:
 		    if( $this->imgdata_bevels == null ) {
-			require_once 'imgdata_bevels.inc';
+			require_once 'imgdata_bevels.inc.php';
 			$this->imgdata_bevels = new ImgData_Bevels();
 		    }
 		    $this->markimg = $this->imgdata_bevels->GetImg($this->type,$filename);
@@ -307,7 +316,7 @@ class PlotMark {
 
 		case MARK_IMG_DIAMOND:
 		    if( $this->imgdata_diamonds == null ) {
-			require_once 'imgdata_diamonds.inc';
+			require_once 'imgdata_diamonds.inc.php';
 			$this->imgdata_diamonds = new ImgData_Diamonds();
 		    }
 		    $this->markimg = $this->imgdata_diamonds->GetImg($this->type,$filename);
@@ -319,7 +328,7 @@ class PlotMark {
 		case MARK_IMG_MBALL:		    
 		case MARK_IMG_LBALL:		    
 		    if( $this->imgdata_balls == null ) {
-			require_once 'imgdata_balls.inc';
+			require_once 'imgdata_balls.inc.php';
 			$this->imgdata_balls = new ImgData_Balls();
 		    }
 		    $this->markimg = $this->imgdata_balls->GetImg($this->type,$filename);
@@ -345,12 +354,17 @@ class PlotMark {
 	    if( !empty($this->csimtarget) ) {
 		$this->csimareas = "<area shape=\"rect\" coords=\"".
 		    $dx.','.$dy.','.round($dx+$dw).','.round($dy+$dh).'" '.
-		    "href=\"".$this->csimtarget."\"";
+		    "href=\"".htmlentities($this->csimtarget)."\"";
+		
+		if( !empty($this->csimwintarget) ) {
+		    $this->csimareas .= " target=\"".$this->csimwintarget."\" ";
+		}
+
 		if( !empty($this->csimalt) ) {
 		    $tmp=sprintf($this->csimalt,$this->yvalue,$this->xvalue);
-		    $this->csimareas .= " title=\"$tmp\"";
+		    $this->csimareas .= " title=\"$tmp\"  alt=\"$tmp\" ";
 		}
-		$this->csimareas .= " alt=\"$tmp\" />\n";
+		$this->csimareas .= " />\n";
 	    }
 	    
 	    // Stroke title

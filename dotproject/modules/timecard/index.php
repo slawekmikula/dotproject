@@ -5,7 +5,7 @@
 // (There is probably a better way to do this...)
 
 global $newTLogTabNum;
-$newTLogTabNum = 2;
+$newTLogTabNum = 3;
 
 // check permissions
 $denyRead = getDenyRead($m);
@@ -34,11 +34,11 @@ $tabBox->add('vw_calendar_by_user', 'Task Logs by Date');
 if ($TIMECARD_CONFIG['minimum_report_level'] >= $AppUI->user_type) {
   $tabBox->add('vw_weekly_by_user', 'Summary by User');
   $tabBox->add('vw_weekly_by_project', 'Summary by Project');
-  $newTLogTabNum = 4;
+  $newTLogTabNum = 5;
 }
 $tabBox->add('vw_monthly_by_user', 'Summary Month/User/Project');
 $tabBox->add('vw_newlog', 'New Task Log');
-    if ($TIMECARD_CONFIG['integrate_with_helpdesk']) {
+    if ($TIMECARD_CONFIG['integrate_with_helpdesk'] && $AppUI->isActiveModule('helpdesk')) {
     $tabBox->add( 'vw_newhelpdesklog', 'New Helpdesk Log' );
 }
 $tabBox->show();

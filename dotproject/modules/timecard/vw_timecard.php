@@ -14,10 +14,6 @@
 	$show_other_worksheets = $TIMECARD_CONFIG['minimum_see_level']>=$AppUI->user_type;
 	$integrate_with_helpdesk = $TIMECARD_CONFIG['integrate_with_helpdesk'];
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
-	//print "<pre>";
-	//print_r($AppUI);
-	//print "</pre>";
-	
 		
 	//compute hours/week from config
 	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
@@ -26,17 +22,15 @@
 	$df = $AppUI->getPref('SHDATEFORMAT');
 
 	if (isset( $_GET['user_id'] )) {
-	//if (isset( $AppUI->user_id )) {
 	
 		$sql = "SELECT user_contact FROM users WHERE user_id = ".$_GET['user_id'];
 		$contact_id = db_loadResult( $sql );
 		$sql = "SELECT contact_company FROM contacts WHERE contact_id = ".$contact_id;
-		//print $sql;
 		$company_id = db_loadResult( $sql );
-		//print $company_id.":".getDenyRead( "companies", $company_id );
-		//Comment out the 3 lines below to skip the company check
+		
+    //Comment out the 3 lines below to skip the company check
     if(getDenyRead( "companies", $company_id )){
-    $AppUI->redirect( "m=public&a=access_denied" );
+        $AppUI->redirect( "m=public&a=access_denied" );
     }
     
 		$AppUI->setState( 'TimecardSelectedUser', $_GET['user_id'] );
@@ -105,11 +99,11 @@
 		$sql = "SELECT users.user_contact,users.user_id,contacts.contact_first_name,contacts.contact_last_name,contacts.contact_id
 		FROM users
 		inner JOIN contacts on contact_id = user_contact
-		WHERE users.user_contact = ".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY contact_first_name, contact_last_name";
+		WHERE users.user_contact = ".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY contact_last_name, contact_first_name";
 		
 		$result = db_loadList($sql);
 		foreach ($result as $user) {
-			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["contact_first_name"]." ".$user["contact_last_name"]."</option>\n";
+			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["contact_last_name"]." ".$user["contact_first_name"]."</option>\n";
 		}
 	?>
 					</select>
@@ -147,7 +141,6 @@
 		." task_log_date >= \"".$start_day->format( FMT_DATETIME_MYSQL )."\" AND "
 		." task_log_date <= \"".$end_day->format( FMT_DATETIME_MYSQL )."\" "
 		." ORDER BY task_log_date";
-//print "<pre>$sql</pre>";
 	$result = db_loadList($sql);
 	$date = $start_day->format("%Y-%m-%d")." 12:00:00";
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
@@ -177,17 +170,22 @@
 					<td nowrap="nowrap" valign="top">
 					<?php if($task['task_id']){ ?>
 						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"]; ?>"><?php echo $task["task_name"]; ?></a>
-					<?php } else if(isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']){ ?>
-						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?php echo $task["task_name"]; ?></a>
+					<?php } else if(isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id']){ ?>
+						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?php echo "HD #" . $task["task_log_help_desk_id"]; ?></a>
 					<?php } else { ?>
 						<?php echo $task["task_log_name"]; ?>
 					<?php } ?>
 					</td>
 					<td>
 					<?php if($task['task_log_creator']==$AppUI->user_id || $can_edit_other_timesheets){ 
-						if(!isset($task['task_log_help_desk_id']) || (isset($task['task_log_help_desk_id']) && !$task['task_log_help_desk_id']) || $integrate_with_helpdesk){
+						if(!isset($task['task_log_help_desk_id']) || (isset($task['task_log_help_desk_id']) && !$task['task_log_help_desk_id']) || ($integrate_with_helpdesk && $AppUI->isActiveModule('helpdesk')) ){
 					?>
+
+					<?php if($task['task_id']){ ?>
 						<a href="?m=timecard&tab=<?php echo isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id'] ? 5 : $newTLogTabNum;?>&tid=<?php echo $task["task_log_id"]; ?>">[<?php echo $AppUI->_('Edit'); ?>]</a>
+					<?php } else if(isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id']){ ?>
+                        <a href="?m=timecard&tab=<?php echo isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id'] ? 6 : $newTLogTabNum+1;?>&tid=<?php echo $task["task_log_id"]; ?>">[<?php echo $AppUI->_('Edit'); ?>]</a>
+					<?php } ?>
 					<?php }
 						} ?>
 					<?php echo $task["task_log_description"]; ?></td>

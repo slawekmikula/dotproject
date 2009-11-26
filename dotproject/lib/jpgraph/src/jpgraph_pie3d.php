@@ -3,8 +3,7 @@
 // File:	JPGRAPH_PIE3D.PHP
 // Description: 3D Pie plot extension for JpGraph
 // Created: 	2001-03-24
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id$
+// Ver:		$Id: jpgraph_pie3d.php 955 2007-11-17 11:41:42Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -50,9 +49,10 @@ class PiePlot3D extends PiePlot {
 	$aGraph->legend->txtcol = array_reverse($aGraph->legend->txtcol);
     }
 
-    function SetCSIMTargets($targets,$alts=null) {
-	$this->csimtargets = $targets;
-	$this->csimalts = $alts;
+    function SetCSIMTargets($aTargets,$aAlts='',$aWinTargets='') {
+	$this->csimtargets = $aTargets;
+	$this->csimwintargets = $aWinTargets;
+	$this->csimalts = $aAlts;
     }
 
     // Should the slices be separated by a line? If color is specified as "" no line
@@ -120,12 +120,21 @@ class PiePlot3D extends PiePlot {
 	}
 	$coords.= ", $xp, $yp";
 	$alt='';
-	if( !empty($this->csimalts[$i]) ) {										
-	    $tmp=sprintf($this->csimalts[$i],$this->data[$i]);
-	    $alt="alt=\"$tmp\" title=\"$tmp\"";
+
+	if( !empty($this->csimtargets[$i]) ) {
+	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->csimtargets[$i]."\"";
+	
+	    if( !empty($this->csimwintargets[$i]) ) {
+		$this->csimareas .= " target=\"".$this->csimwintargets[$i]."\" "; 
+	    }
+	    
+	    if( !empty($this->csimalts[$i]) ) {										
+		$tmp=sprintf($this->csimalts[$i],$this->data[$i]);
+		$this->csimareas .= "alt=\"$tmp\" title=\"$tmp\" ";
+	    }
+	    $this->csimareas .=  " />\n";
 	}
-	if( !empty($this->csimtargets[$i]) )
-	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".$this->csimtargets[$i]."\" $alt />\n";
+
     }
 
     function SetLabels($aLabels,$aLblPosAdj="auto") {
@@ -174,7 +183,7 @@ class PiePlot3D extends PiePlot {
     
 
 // Draw one 3D pie slice at position ($xc,$yc) with height $z
-    function Pie3DSlice($img,$xc,$yc,$w,$h,$sa,$ea,$z,$fillcolor,$shadow=0.65) {
+    function Pie3DSlice(&$img,$xc,$yc,$w,$h,$sa,$ea,$z,$fillcolor,$shadow=0.65) {
 	
 	// Due to the way the 3D Pie algorithm works we are
 	// guaranteed that any slice we get into this method
@@ -391,7 +400,7 @@ class PiePlot3D extends PiePlot {
     }
     
 // Draw a 3D Pie
-    function Pie3D($aaoption,$img,$data,$colors,$xc,$yc,$d,$angle,$z,
+    function Pie3D($aaoption,&$img,$data,$colors,$xc,$yc,$d,$angle,$z,
 		   $shadow=0.65,$startangle=0,$edgecolor="",$edgeweight=1) {
 
 	//---------------------------------------------------------------------------
@@ -650,9 +659,11 @@ class PiePlot3D extends PiePlot {
 	    $margin = $img->GetFontHeight()/2 + $this->value->margin ;
 	    for($i=0; $i < count($data); ++$i ) {
 		$la = $labeldata[$i][0];
-		$x = $labeldata[$i][1] + cos($la*M_PI/180)*($d+$margin);
-		$y = $labeldata[$i][2] - sin($la*M_PI/180)*($h+$margin);
-		if( $la > 180 && $la < 360 ) $y += $z;
+		$x = $labeldata[$i][1] + cos($la*M_PI/180)*($d+$margin)*$this->ilabelposadj;
+		$y = $labeldata[$i][2] - sin($la*M_PI/180)*($h+$margin)*$this->ilabelposadj;
+		if( $this->ilabelposadj >= 1.0 ) {
+		    if( $la > 180 && $la < 360 ) $y += $z;
+		}
 		if( $this->labeltype == 0 ) {
 		    if( $sum > 0 )
 			$l = 100*$data[$i]/$sum;
@@ -711,7 +722,7 @@ class PiePlot3D extends PiePlot {
 	$img->PopColor();
     }
 
-    function StrokeFullSliceFrame($img,$xc,$yc,$sa,$ea,$w,$h,$z,$edgecolor,$exploderadius,$fulledge) {
+    function StrokeFullSliceFrame(&$img,$xc,$yc,$sa,$ea,$w,$h,$z,$edgecolor,$exploderadius,$fulledge) {
 	$step = 0.02;
 
 	if( $exploderadius > 0 ) {
@@ -769,7 +780,7 @@ class PiePlot3D extends PiePlot {
 	}
     }
 
-    function Stroke($img,$aaoption=0) {
+    function Stroke(&$img,$aaoption=0) {
 	$n = count($this->data);
 
 	// If user hasn't set the colors use the theme array
@@ -857,7 +868,7 @@ class PiePlot3D extends PiePlot {
 // PRIVATE METHODS	
 
     // Position the labels of each slice
-    function StrokeLabels($label,$img,$a,$xp,$yp,$z) {
+    function StrokeLabels($label,&$img,$a,$xp,$yp,$z) {
 	$this->value->halign="left";
 	$this->value->valign="top";
 

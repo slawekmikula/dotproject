@@ -286,13 +286,13 @@ $taskLogReference = dPgetSysVal( 'TaskLogReference' );
 				$q->leftJoin('contacts', 'c', 'c.contact_id = tc.contact_id');
 				$q->addWhere("tc.task_id = '$task_id'");
 				$q->addQuery('tc.contact_id');
-				$q->addQuery('c.contact_first_name, c.contact_last_name');
+				$q->addQuery('c.contact_last_name, c.contact_first_name');
 				$req =& $q->exec();
 				$cid = array();
 				for ($req; ! $req->EOF; $req->MoveNext()) {
 					$cid[] = $req->fields['contact_id'];
-					$task_email_title[] = $req->fields['contact_first_name']
-					. ' ' . $req->fields['contact_last_name'];
+					$task_email_title[] = $req->fields['contact_last_name']
+					. ' ' . $req->fields['contact_first_name'];
 				}
 				echo implode(',', $cid);
 ?>'>
@@ -309,15 +309,15 @@ $taskLogReference = dPgetSysVal( 'TaskLogReference' );
 				$q->leftJoin('contacts', 'c', 'c.contact_id = pc.contact_id');
 				$q->addWhere("pc.project_id = '$obj->task_project'");
 				$q->addQuery('pc.contact_id');
-				$q->addQuery('c.contact_first_name, c.contact_last_name');
+				$q->addQuery('c.contact_last_name, c.contact_first_name');
 				$req =& $q->exec();
 				$cid = array();
 				$proj_email_title = array();
 				for ($req; ! $req->EOF; $req->MoveNext()) {
 					if (! in_array($req->fields['contact_id'], $cid)) {
 					  $cid[] = $req->fields['contact_id'];
-					  $proj_email_title[] = $req->fields['contact_first_name']
-					  . ' ' . $req->fields['contact_last_name'];
+					  $proj_email_title[] = $req->fields['contact_last_name']
+					  . ' ' . $req->fields['contact_first_name'];
 					}
 				}
 				echo implode(',', $cid);

@@ -2158,6 +2158,7 @@ class CTaskLog extends CDpObject
 	var $task_log_problem = NULL;
 	var $task_log_reference = NULL;
 	var $task_log_related_url = NULL;
+    var $task_log_help_desk_id = NULL;
 	
 	
 	function CTaskLog() {

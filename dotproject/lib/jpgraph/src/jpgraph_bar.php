@@ -3,8 +3,7 @@
 // File:	JPGRAPH_BAR.PHP
 // Description:	Bar plot extension for JpGraph
 // Created: 	2001-01-08
-// Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id$
+// Ver:		$Id: jpgraph_bar.php 1013 2008-06-27 06:33:43Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -79,7 +78,7 @@ class BarPlot extends Plot {
 	    $color=array($this->grad_fromcolor,$this->grad_tocolor);
 	    // In order to differentiate between gradients and cooors specified as an RGB triple
 	    $graph->legend->Add($this->legend,$color,"",-$this->grad_style,
-				$this->legendcsimtarget,$this->legendcsimalt);
+				$this->legendcsimtarget,$this->legendcsimalt,$this->legendcsimwintarget);
 	}
 	elseif( $this->legend!="" && ($this->iPattern > -1 || is_array($this->iPattern)) ) {
 	    if( is_array($this->iPattern) ) {
@@ -95,16 +94,16 @@ class BarPlot extends Plot {
 	    $color = array($p1,$p2,$p3,$this->fill_color);
 	    // A kludge: Too mark that we add a pattern we use a type value of < 100
 	    $graph->legend->Add($this->legend,$color,"",-101,
-				$this->legendcsimtarget,$this->legendcsimalt);
+				$this->legendcsimtarget,$this->legendcsimalt,$this->legendcsimwintarget);
 	}
 	elseif( $this->fill_color && $this->legend!="" ) {
 	    if( is_array($this->fill_color) ) {
 		$graph->legend->Add($this->legend,$this->fill_color[0],"",0,
-				    $this->legendcsimtarget,$this->legendcsimalt);
+				    $this->legendcsimtarget,$this->legendcsimalt,$this->legendcsimwintarget);
 	    }
 	    else {
 		$graph->legend->Add($this->legend,$this->fill_color,"",0,
-				    $this->legendcsimtarget,$this->legendcsimalt);	
+				    $this->legendcsimtarget,$this->legendcsimalt,$this->legendcsimwintarget);	
 	    }
 	}
     }
@@ -137,6 +136,7 @@ class BarPlot extends Plot {
 	    }
 
 	}
+	/*
 	elseif( is_a($this,'AccBarPlot') || is_a($this,'GroupBarPlot') ) { 
 	    // We only set an absolute width for linear and int scale
 	    // for text scale the width will be set to a fraction of
@@ -147,6 +147,7 @@ class BarPlot extends Plot {
 		$this->abswidth = $graph->img->plotwidth/(2*count($this->coords[0]));
 	    }
 	}
+	*/
     }
 
     function Min() {
@@ -164,8 +165,13 @@ class BarPlot extends Plot {
     }	
 	
     // Specify width as fractions of the major stepo size
-    function SetWidth($aFractionWidth) {
-	$this->width=$aFractionWidth;
+    function SetWidth($aWidth) {
+	if( $aWidth > 1 ) {
+	    // Interpret this as absolute width
+	    $this->abswidth=$aWidth;
+	}
+	else
+	    $this->width=$aWidth;
     }
 	
     // Specify width in absolute pixels. If specified this
@@ -186,14 +192,14 @@ class BarPlot extends Plot {
 		
     function SetFillColor($aColor) {
 	$this->fill = true ;
-	$this->fill_color=$aColor;
+	$this->fill_color = $aColor;
     }
 	
-    function SetFillGradient($from_color,$to_color,$style) {
-	$this->grad=true;
-	$this->grad_fromcolor=$from_color;
-	$this->grad_tocolor=$to_color;
-	$this->grad_style=$style;
+    function SetFillGradient($aFromColor,$aToColor=null,$aStyle=null) {
+	$this->grad = true;
+	$this->grad_fromcolor = $aFromColor;
+	$this->grad_tocolor   = $aToColor;
+	$this->grad_style     = $aStyle;
     }
 	
     function SetValuePos($aPos) {
@@ -308,13 +314,13 @@ class BarPlot extends Plot {
 	if( is_array($this->iPattern) ) {
 	    $np = count($this->iPattern);
 	}
-					
+		
+	$grad = null;
 	for($i=0; $i < $numbars; ++$i) {
 
  	    // If value is NULL, or 0 then don't draw a bar at all
- 	    if ($this->coords[0][$i] === null ||
-		$this->coords[0][$i] === '' ||
-		$this->coords[0][$i] === 0 ) continue;    
+ 	    if ($this->coords[0][$i] === null || $this->coords[0][$i] === '' ) 
+	        continue;    
 
 	    if( $exist_x ) $x=$this->coords[1][$i];
 	    else $x=$i;
@@ -339,10 +345,38 @@ class BarPlot extends Plot {
 		$x+$abswidth,$yscale->Translate($this->coords[0][$i]),
 		$x+$abswidth,$zp);
 	    if( $this->grad ) {
-		$grad = new Gradient($img);
-		$grad->FilledRectangle($pts[2],$pts[3],
-				       $pts[6],$pts[7],
-				       $this->grad_fromcolor,$this->grad_tocolor,$this->grad_style); 
+		if( $grad === null ) 
+		    $grad = new Gradient($img);
+		if( is_array($this->grad_fromcolor) ) {
+		    // The first argument (grad_fromcolor) can be either an array or a single color. If it is an array
+		    // then we have two choices. It can either a) be a single color specified as an RGB triple or it can be
+		    // an array to specify both (from, to style) for each individual bar. The way to know the difference is 
+		    // to investgate the first element. If this element is an integer [0,255] then we assume it is an RGB 
+		    // triple.
+		    $ng = count($this->grad_fromcolor);
+		    if( $ng === 3 ) {
+			if( is_numeric($this->grad_fromcolor[0]) && $this->grad_fromcolor[0] > 0 && $this->grad_fromcolor[0] < 256 ) {
+			    // RGB Triple
+			    $fromcolor = $this->grad_fromcolor;
+			    $tocolor = $this->grad_tocolor;
+			    $style = $this->grad_style;
+			}
+		    }
+		    else {
+			$fromcolor = $this->grad_fromcolor[$i % $ng][0];
+			$tocolor = $this->grad_fromcolor[$i % $ng][1];
+			$style = $this->grad_fromcolor[$i % $ng][2];
+		    }
+		    $grad->FilledRectangle($pts[2],$pts[3],
+					   $pts[6],$pts[7],
+					   $fromcolor,$tocolor,$style); 
+		}
+		else {
+		    $grad->FilledRectangle($pts[2],$pts[3],
+					   $pts[6],$pts[7],
+					   $this->grad_fromcolor,$this->grad_tocolor,$this->grad_style); 
+		}
+					       
 	    }
 	    elseif( !empty($this->fill_color) ) {
 		if(is_array($this->fill_color)) {
@@ -455,9 +489,11 @@ class BarPlot extends Plot {
 		$img->SetLineWeight($this->weight);
 		$img->Polygon($pts);
 	    }
-			
+
 	    // Determine how to best position the values of the individual bars
 	    $x=$pts[2]+($pts[4]-$pts[2])/2;
+	    $this->value->SetMargin(5);
+
 	    if( $this->valuepos=='top' ) {
 		$y=$pts[3];
 		if( $img->a === 90 ) {
@@ -467,20 +503,38 @@ class BarPlot extends Plot {
 			$this->value->SetAlign('left','center');
 			
 		}
+		else {
+		    if( $val < 0 ) { 
+			$this->value->SetMargin(-5);
+			$y=$pts[1];
+			$this->value->SetAlign('center','bottom');
+		    }
+		    else {
+			$this->value->SetAlign('center','bottom');			
+		    }
+
+		}
 		$this->value->Stroke($img,$val,$x,$y);
 	    }
 	    elseif( $this->valuepos=='max' ) {
 		$y=$pts[3];
 		if( $img->a === 90 ) {
-		    if( $val < 0 )
+		    if( $val < 0 ) {
 			$this->value->SetAlign('left','center');
-		    else
+		    }
+		    else {
 			$this->value->SetAlign('right','center');		    
+		    }
 		}
 		else {
-		    $this->value->SetAlign('center','top');
+		    if( $val < 0 ) {
+			$this->value->SetAlign('center','bottom');
+		    }
+		    else {
+			$this->value->SetAlign('center','top');
+		    }
 		}
-		$this->value->SetMargin(-3);
+		$this->value->SetMargin(-5);
 		$this->value->Stroke($img,$val,$x,$y);
 	    }
 	    elseif( $this->valuepos=='center' ) {
@@ -504,21 +558,26 @@ class BarPlot extends Plot {
 		JpGraphError::RaiseL(2006,$this->valuepos);
 //('Unknown position for values on bars :'.$this->valuepos);
 	    }
-	    // Create the client side image map
-	    $rpts = $img->ArrRotate($pts);		
-	    $csimcoord=round($rpts[0]).", ".round($rpts[1]);
-	    for( $j=1; $j < 4; ++$j){
-		$csimcoord .= ", ".round($rpts[2*$j]).", ".round($rpts[2*$j+1]);
-	    }	    	    
 	    if( !empty($this->csimtargets[$i]) ) {
+		// Create the client side image map
+		$rpts = $img->ArrRotate($pts);		
+		$csimcoord=round($rpts[0]).", ".round($rpts[1]);
+		for( $j=1; $j < 4; ++$j){
+		    $csimcoord .= ", ".round($rpts[2*$j]).", ".round($rpts[2*$j+1]);
+		}	    	    
 		$this->csimareas .= '<area shape="poly" coords="'.$csimcoord.'" ';    	    
-		$this->csimareas .= " href=\"".$this->csimtargets[$i]."\"";
+		$this->csimareas .= " href=\"".htmlentities($this->csimtargets[$i])."\"";
+
+		if( !empty($this->csimwintargets[$i]) ) {
+		    $this->csimareas .= " target=\"".$this->csimwintargets[$i]."\" ";
+		}
+
 		$sval='';
 		if( !empty($this->csimalts[$i]) ) {
 		    $sval=sprintf($this->csimalts[$i],$this->coords[0][$i]);
-		    $this->csimareas .= " title=\"$sval\" ";
+		    $this->csimareas .= " title=\"$sval\" alt=\"$sval\" ";
 		}
-		$this->csimareas .= " alt=\"$sval\" />\n";
+		$this->csimareas .= " />\n";
 	    }
 	}
 	return true;
@@ -530,13 +589,12 @@ class BarPlot extends Plot {
 // Description: Produce grouped bar plots
 //===================================================
 class GroupBarPlot extends BarPlot {
-    var $plots;
-    var $width=0.7;
-    var $nbrplots=0;
+    var $plots=array(), $nbrplots=0;
     var $numpoints;
 //---------------
 // CONSTRUCTOR
     function GroupBarPlot($plots) {
+	$this->width=0.5;
 	$this->plots = $plots;
 	$this->nbrplots = count($plots);
 	if( $this->nbrplots < 1 ) {
@@ -599,6 +657,7 @@ class GroupBarPlot extends BarPlot {
 	$tmp=$xscale->off;
 	$n = count($this->plots);
 	$subwidth = $this->width/$this->nbrplots ; 
+
 	for( $i=0; $i < $n; ++$i ) {
 	    $this->plots[$i]->ymin=$this->ybase;
 	    $this->plots[$i]->SetWidth($subwidth);
@@ -608,8 +667,7 @@ class GroupBarPlot extends BarPlot {
 	    // If we assume it is always one the positioning will work
 	    // fine with a text scale but this will not work with
 	    // arbitrary linear scale
-	    $xscale->off = $tmp+$i*round(/*$xscale->ticks->major_step* */
-					$xscale->scale_factor* $subwidth);
+	    $xscale->off = $tmp+$i*round($xscale->scale_factor* $subwidth);
 	    $this->plots[$i]->Stroke($img,$xscale,$yscale);
 	}
 	$xscale->off=$tmp;
@@ -822,12 +880,18 @@ class AccBarPlot extends BarPlot {
 		} else {
 		    if (is_array($this->plots[$j]->fill_color) ) {
 			$numcolors = count($this->plots[$j]->fill_color);
-			$img->SetColor($this->plots[$j]->fill_color[$i % $numcolors]);
+			$fillcolor = $this->plots[$j]->fill_color[$i % $numcolors];
+			// If the bar is specified to be non filled then the fill color is false
+			if( $fillcolor !== false ) 
+			    $img->SetColor($this->plots[$j]->fill_color[$i % $numcolors]);
 		    }
 		    else {
-			$img->SetColor($this->plots[$j]->fill_color);
+			$fillcolor = $this->plots[$j]->fill_color;
+			if( $fillcolor !== false ) 
+			    $img->SetColor($this->plots[$j]->fill_color);
 		    }
-		    $img->FilledPolygon($pts);
+		    if( $fillcolor !== false )
+			$img->FilledPolygon($pts);
 		    $img->SetColor($this->plots[$j]->color);
 		}				  
 
@@ -864,7 +928,13 @@ class AccBarPlot extends BarPlot {
 		    }	    	    
 		    if( ! empty($this->plots[$j]->csimtargets[$i]) ) {
 			$this->csimareas.= '<area shape="poly" coords="'.$csimcoord.'" '; 
-			$this->csimareas.= " href=\"".$this->plots[$j]->csimtargets[$i]."\"";
+			$this->csimareas.= " href=\"".$this->plots[$j]->csimtargets[$i]."\" ";
+
+			if( ! empty($this->plots[$j]->csimwintargets[$i]) ) {
+			    $this->csimareas.= " target=\"".$this->plots[$j]->csimwintargets[$i]."\" ";
+			}
+
+			$sval='';
 			if( !empty($this->plots[$j]->csimalts[$i]) ) {
 			    $sval=sprintf($this->plots[$j]->csimalts[$i],$this->plots[$j]->coords[0][$i]);
 			    $this->csimareas .= " title=\"$sval\" ";
@@ -875,7 +945,9 @@ class AccBarPlot extends BarPlot {
 
 		$pts[] = $pts[0];
 		$pts[] = $pts[1];
+		$img->SetLineWeight($this->plots[$j]->line_weight);
 		$img->Polygon($pts);
+		$img->SetLineWeight(1);
 	    }
 		
 	    // Draw labels for each acc.bar
