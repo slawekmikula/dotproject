@@ -36,7 +36,7 @@ if ($TIMECARD_CONFIG['minimum_report_level'] >= $AppUI->user_type) {
   $tabBox->add('vw_weekly_by_project', 'Summary by Project');
   $newTLogTabNum = 5;
 }
-$tabBox->add('vw_monthly_by_user', 'Summary Month/User/Project');
+$tabBox->add('vw_monthly_by_user', 'Summary');
 $tabBox->add('vw_newlog', 'New Task Log');
     if ($TIMECARD_CONFIG['integrate_with_helpdesk'] && $AppUI->isActiveModule('helpdesk')) {
     $tabBox->add( 'vw_newhelpdesklog', 'New Helpdesk Log' );

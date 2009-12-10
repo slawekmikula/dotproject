@@ -60,6 +60,11 @@ class CSetupHelpDesk {
       ADD `task_log_help_desk_id` int(11) NOT NULL default '0' AFTER `task_log_task`
     ";
 
+        $bulk_sql[] = "
+      ALTER TABLE `files`
+      ADD `file_helpdesk_item` int(11) NOT NULL default '0' AFTER `file_task`
+    ";
+
 		$bulk_sql[] = "
 		  CREATE TABLE `helpdesk_item_status` (
 		    `status_id` INT NOT NULL AUTO_INCREMENT,

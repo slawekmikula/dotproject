@@ -61,7 +61,7 @@
 "On Hold"=>"Wstrzymany",
 "Open"=>"Otwarty",
 "Opened On"=>"Otwarty w",
-"Opened Today"=>"Edytowane dzisiaj",
+"Opened Today"=>"Otwarte dzisiaj",
 "Operating System"=>"System operacyjny",
 "Pages"=>"Strony",
 "Paging Options"=>"Stronicowanie",

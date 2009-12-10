@@ -3,13 +3,13 @@ include_once( $AppUI->getModuleClass( 'tasks' ) );
 global $task_access, $task_priority, $project_id;
 
 $type = dPgetsysval('TaskType');
-$stype = array(''=>'(Type)') + $type;
+$stype = array(''=>'(' . $AppUI->_('Type') . ')') + $type;
 $priority = dPgetsysval('TaskPriority');
-$spriority = array(''=>'(Priority)') + $priority;
-$stask_access = array(''=>'(Access)') + $task_access;
+$spriority = array(''=>'(' . $AppUI->_('Priority') . ')') + $priority;
+$stask_access = array(''=>'(' . $AppUI->_('Access') . ')') + $task_access;
 $durntype = dPgetSysval('TaskDurationType');
-$sdurntype = array( ''=>'(Duration Type)') + $durntype;
-$sother = array(''=>'(Other Operations)','1'=>'Mark Tasks as Finished','8'=>'Mark Tasks as Active','9'=>'Mark Tasks as Inactive','2'=>'Mark Tasks as Milestones','3'=>'Mark Tasks as Non Milestone','4'=>'Mark Tasks as Dynamic','5'=>'Mark Tasks as Non Dynamic','6'=>'Add Task Reminder','7'=>'Remove Task Reminder','99'=>'Delete Tasks');
+$sdurntype = array( ''=>'(' . $AppUI->_('Priority') . 'Duration Type)') + $durntype;
+$sother = array(''=>'(' . $AppUI->_('Other Operations') . ')','1'=>'' . $AppUI->_('Mark Tasks as Finished') . '','8'=>'' . $AppUI->_('Mark Tasks as Active') . '','9'=>'' . $AppUI->_('Mark Tasks as Inactive') . '','2'=>'' . $AppUI->_('Mark Tasks as Milestones') . '','3'=>'' . $AppUI->_('Mark Tasks as Non Milestone') . '','4'=>'' . $AppUI->_('Mark Tasks as Dynamic') . '','5'=>'' . $AppUI->_('Mark Tasks as Non Dynamic') . '','6'=>'' . $AppUI->_('Add Task Reminder') . '','7'=>'' . $AppUI->_('Remove Task Reminder') . '','99'=>'' . $AppUI->_('Delete Tasks') . '');
 
 //Pull all users
 $q = new DBQuery;
@@ -24,9 +24,9 @@ while ( $row = $q->fetchRow()) {
 	$users[$row['user_id']] = $row['contact_first_name'] . ' ' . $row['contact_last_name'];
 }
 $q->clear();
-$sowners = array(''=>'(Task Owner)') + $users;
-$sassign = array(''=>'(Assign User)') + $users;
-$sunassign = array(''=>'(Unassign User)') + $users;
+$sowners = array(''=>'(' . $AppUI->_('Task Owner') . ')') + $users;
+$sassign = array(''=>'(' . $AppUI->_('Assign User') . ')') + $users;
+$sunassign = array(''=>'(' . $AppUI->_('Unassign User') . ')') + $users;
 
 $obj =& new CTask;
 $allowedTasks = $obj->getAllowedSQL($AppUI->user_id, 'tasks.task_id');

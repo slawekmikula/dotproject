@@ -39,13 +39,10 @@ class CFile extends CDpObject {
 	var $file_folder = NULL;
 	var $file_checkout = NULL;
 	var $file_co_reason = NULL;
+	var $file_helpdesk_item = NULL;
 	
 	var $_message = NULL;
-	
-	// This "breaks" check-in/upload if helpdesk is not present.
-	// class variable needs to be added "dymanically"
-	//var $file_helpdesk_item = NULL;
-	
+		
 	
 	function CFile() {
 		global $AppUI, $helpdesk_available;

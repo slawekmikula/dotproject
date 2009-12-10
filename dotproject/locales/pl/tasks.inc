@@ -68,7 +68,7 @@
 "Do you want to accept this changes?"=>"Czy chcesz wprowadzić zmiany?",
 "Done"=>"Zakończone",
 "Due In"=>"Do ",
-"Dur."=>"trwa",
+"Dur."=>"Trwa",
 "Duration"=>"Czas trwania",
 "Dynamic Task"=>"Dynamiczne zadanie",
 "Dynamic Tasks"=>"Dynamiczne zadania",

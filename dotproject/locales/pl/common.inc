@@ -237,3 +237,5 @@
 "tabbed"=>"Wyświetl w zakładkach",
 "test"=>"Test",
 "updated"=>"Uaktualnione",
+"Year"=>"Rok",
+"Month"=>"Miesiąc",

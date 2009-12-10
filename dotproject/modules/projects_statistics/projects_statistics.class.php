@@ -42,7 +42,7 @@ class CProjectsStatistics extends CDpObject {
 
     $query = new DBQuery;
     $query->addTable("projects", 'p');
-    $query->addQuery('p.project_id, p.project_end_date, p.project_percent_complete');
+    $query->addQuery('p.project_id, p.project_end_date, p.project_percent_complete, p.project_active');
 
     $projects =& $query->exec();
 

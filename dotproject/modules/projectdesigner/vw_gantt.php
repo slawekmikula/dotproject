@@ -10,7 +10,7 @@ $projectStatus = dPgetSysVal( 'ProjectStatus' );
 <tr>
     <td align="center" colspan="20">
 <?php
-      $src = "?m=projectdesigner&a=gantt&suppressHeaders=1&showLabels=1&proFilter=&showInactive=1showAllGantt=1&project_id=$project_id&width=' + ((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.90) + '";      
+      $src = "?m=tasks&a=gantt&suppressHeaders=1&showLabels=0&proFilter=&showInactive=1showAllGantt=1&project_id=$project_id&width=' + ((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.90) + '";
       echo "<script>document.write('<img src=\"$src\">')</script>";
 ?>
 </td>

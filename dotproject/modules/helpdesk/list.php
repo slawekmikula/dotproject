@@ -95,7 +95,7 @@ if($HELPDESK_CONFIG['search_criteria_status']){
 	if ($status >= 0) {
 		$tarr[] = "hi.item_status=$status";
 	} elseif ($status == -2) {
-		$tarr[] = "hi.item_status<>2";
+		$tarr[] = "hi.item_status<>2 and hi.item_status<>3 ";
 	}
 
 	if (!$_REQUEST['project_id'] && !$_REQUEST['company_id']) {
@@ -577,7 +577,14 @@ if ($total_results > $items_per_page) {
 
   print "<tr><td colspan=\"9\" align=\"center\">";
 
-  $link = "?m=helpdesk&a=list&page=";
+  $string=$_SERVER['REQUEST_URI'] ;
+  if (strpos($string,'&page=')!=0) {
+    $DeleteThis =strrchr($string, '&page=');
+    $HostAddress=str_replace($DeleteThis, '', $string);
+  } else{
+    $HostAddress=$string;
+  }
+  $link = $HostAddress."&page=";
 
   if ($page > 0) {
     print "<a href=\"{$link}0\">&larr; "

@@ -175,8 +175,9 @@ function displayFolders($folder_id=0, $level=0) {
 		
 		
 		if ($file_count > 0) {
-			echo ('<div class="files-list" id="files_' . $folder_id . '" style="display:' 
-			      . (($level || $open_folder) ? 'none' : 'block') . ';">');
+			//echo ('<div class="files-list" id="files_' . $folder_id . '" style="display:'
+			//      . (($level || $open_folder ) ? 'none' : 'block') . ';">');
+            echo ('<div class="files-list" id="files_' . $folder_id . '" style="display: none;">');
 			displayFiles($folder_id);
 			echo '</div>';
 		} else if ($folder && !($folder_id && $level)) {
@@ -419,7 +420,6 @@ function displayFiles($folder_id) {
 		<th nowrap="nowrap"><?php echo $AppUI->_('Task Name'); ?></th>
 		<th nowrap="nowrap"><?php echo $AppUI->_('Owner'); ?></th>
 		<th nowrap="nowrap"><?php echo $AppUI->_('Size'); ?></th>
-		<th nowrap="nowrap"><?php echo $AppUI->_('Type'); ?></a></th>
 		<th nowrap="nowrap"><?php echo $AppUI->_('Date'); ?></th>
 		<th nowrap="nowrap"><?php echo $AppUI->_('co Reason') ?></th>
 		<th nowrap="nowrap"><?php echo $AppUI->_('co') ?></th>
@@ -512,9 +512,6 @@ function displayFiles($folder_id) {
 		</td>
 		<td width="5%" nowrap="nowrap" align="right">
 		  <?php echo file_size(intval($row['file_size'])); ?>
-		</td>
-		<td nowrap="nowrap">
-		  <?php echo ($row['file_type']); ?>
 		</td>
 		<td width="15%" nowrap="nowrap" align="right">
 		  <?php echo $file_date->format($df . ' ' . $tf); ?>

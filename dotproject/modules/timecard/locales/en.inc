@@ -3,7 +3,7 @@
 "Task Logs by Date",
 "Summary by User",
 "Summary by Project",
-"Summary Month/User/Project",
+"Summary",
 "New Task Log",
 "New Helpdesk Log",
 "through",

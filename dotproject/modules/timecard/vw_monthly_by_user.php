@@ -3,6 +3,15 @@
 
     $show_other_worksheets = $TIMECARD_CONFIG['minimum_see_level']>=$AppUI->user_type;
 
+	if (isset( $_GET['year'] )) {
+		$AppUI->setState( 'TimecardMonthlyYear', $_GET['year'] );
+	} else {
+        $current_date = new CDate();
+        $AppUI->setState( 'TimecardMonthlyYear', $current_date->getYear() );
+    }
+    $year = $AppUI->getState('TimecardMonthlyYear');
+
+
 	if (isset( $_GET['month'] )) {
 		$AppUI->setState( 'TimecardMonthlyMonth', $_GET['month'] );
 	} else {
@@ -24,11 +33,15 @@
 
     $start_report = new CDate();
     $start_report->setMonth($month);
+    $start_report->setYear($year);
     $start_report->setDay(1);
+    $start_report->setTime(0,0,0);
+
     $end_report = new CDate();
     $end_report->copy($start_report);
-    $end_report->setMonth($month+1);
+    $end_report->addMonths(1);
     $end_report->addDays(-1);
+    $end_report->setTime(23,59,59);
 
 	//Get hash of users
 	$sql = "SELECT user_id, contact_email, concat(contact_last_name,' ',contact_first_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_last_name, contact_first_name;";
@@ -42,6 +55,7 @@
 	}
 	unset($result);
 
+
     $sql = "
         select distinct(project_id), project_name from task_log
         left join tasks on tasks.task_id = task_log.task_log_task
@@ -54,6 +68,7 @@
         order by project_name
 		";
 
+#    echo $sql;
     $projects = array();
     $result = db_loadList($sql);
     foreach($result as $row){
@@ -101,6 +116,30 @@
         '12' => $AppUI->_('December'),
 		);
 
+    $years = array(
+		'2000' => '2000',
+		'2001' => '2001',
+        '2002' => '2002',
+        '2003' => '2003',
+        '2004' => '2004',
+        '2005' => '2005',
+        '2006' => '2006',
+        '2007' => '2007',
+        '2008' => '2008',
+        '2009' => '2009',
+        '2010' => '2010',
+        '2011' => '2011',
+        '2012' => '2012',
+        '2013' => '2013',
+        '2014' => '2014',
+        '2015' => '2015',
+        '2016' => '2016',
+        '2017' => '2017',
+        '2018' => '2018',
+        '2019' => '2019',
+        '2020' => '2020',
+		);
+
 ?>
 
 <form name="frmSelect" action="" method="get">
@@ -115,8 +154,12 @@
         <?php echo arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $user_id )?>
         </td>
         <?php } ?>
-        <td><?php echo $AppUI->_('Date'); ?></td>
-		<td width="98%" align="left" valign="top">
+        <td><?php echo $AppUI->_('Year'); ?></td>
+		<td width="5%" align="left" valign="top">
+        <?php echo arraySelect( $years, 'year', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $year )?>
+		</td>
+        <td><?php echo $AppUI->_('Month'); ?></td>
+		<td width="90%" align="left" valign="top">
         <?php echo arraySelect( $months, 'month', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $month )?>
 		</td>
 	</tr>

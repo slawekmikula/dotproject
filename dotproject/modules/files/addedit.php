@@ -25,6 +25,7 @@ $referrer = $referrerArray['query'] . $referrerArray['fragment'];
 require_once($AppUI->getModuleClass('companies'));
 require_once($AppUI->getModuleClass('projects'));
 require_once $AppUI->getModuleClass('tasks');
+require_once $AppUI->getModuleClass('helpdesk');
 
 $file_task = intval(dPgetParam($_GET, 'file_task', 0));
 $file_parent = intval(dPgetParam($_GET, 'file_parent', 0));

@@ -8,7 +8,7 @@ if (!defined('DP_BASE_DIR')) {
 // Files modules: index page re-usable sub-table
 GLOBAL $AppUI, $m, $canRead, $canEdit, $canAdmin;
 GLOBAL $company_id, $project_id, $task_id;
-GLOBAL $currentTabId, $currentTabName, $tabbed;
+GLOBAL $currentTabId, $currentTabName, $tabbed, $helpdesk_item_id;
 
 // ****************************************************************************
 // Page numbering variables
@@ -29,7 +29,7 @@ GLOBAL $currentTabId, $currentTabName, $tabbed;
 // $xpg_sqlquery	- SELECT for the SELECT LIMIT
 // $xpg_result		- pointer to results from SELECT LIMIT
 
-$tab = ((!$company_id && !$project_id && !$task_id) || $m=='files') ? $currentTabId : 0;
+$tab = ((!$company_id && !$project_id && !$task_id && !$helpdesk_item_id) || $m=='files') ? $currentTabId : 0;
 $page = dPgetParam($_GET, "page", 1);
 if (!isset($project_id)) {
 	$project_id = dPgetParam($_REQUEST, 'project_id', 0);
@@ -54,7 +54,7 @@ $df = $AppUI->getPref('SHDATEFORMAT');
 $tf = $AppUI->getPref('TIMEFORMAT');
 
 $file_types = dPgetSysVal("FileType");
-if (($company_id || $project_id || $task_id) && !($m=='files')) {
+if (($company_id || $project_id || $task_id || $helpdesk_item_id) && !($m=='files')) {
 	$category_filter = false;
 } else if ($tabbed) {
 	$category_filter = (($tab <= 0) ? false : ("file_category = " . --$tab)) ;
@@ -88,6 +88,9 @@ if (count($allowedFolders)) {
 if ($category_filter) {
 	$q->addWhere($category_filter);
 }
+if (isset($helpdesk_item_id)) {
+	$q->addWhere('f.file_helpdesk_item = ' . $helpdesk_item_id . ' ');
+}
 if ($company_id) {
 	$q->addWhere('p.project_company = ' . $company_id);
 }
@@ -117,6 +120,9 @@ if (count ($allowedTasks)) {
 }
 if (count($allowedFolders)) {
 	$r->addWhere('((' . implode(' AND ', $allowedFolders) . ') OR f.file_folder = 0)');
+}
+if (isset($helpdesk_item_id)) {
+	$r->addWhere('f.file_helpdesk_item = ' . $helpdesk_item_id . ' ');
 }
 if ($company_id) {
 	$r->innerJoin('companies', 'co', 'co.company_id = p.project_company');
@@ -149,6 +155,9 @@ if (count ($allowedTasks)) {
 }
 if (count($allowedFolders)) {
 	$q2->addWhere('((' . implode(' AND ', $allowedFolders) . ') OR f.file_folder = 0)');
+}
+if (isset($helpdesk_item_id)) {
+	$q2->addWhere('f.file_helpdesk_item = ' . $helpdesk_item_id . ' ');
 }
 if ($category_filter) {
 	$q2->addWhere($category_filter);
@@ -195,6 +204,9 @@ if (count ($allowedTasks)) {
 }
 if (count($allowedFolders)) {
 	$q3->addWhere('((' . implode(' AND ', $allowedFolders) . ') OR f.file_folder = 0)');
+}
+if (isset($helpdesk_item_id)) {
+	$q3->addWhere('f.file_helpdesk_item = ' . $helpdesk_item_id . ' ');
 }
 if ($category_filter) {
 	$q3->addWhere($category_filter);
@@ -248,7 +260,6 @@ function expand(id) {
 	<th nowrap="nowrap"><?php echo $AppUI->_('Task Name'); ?></th>
 	<th nowrap="nowrap"><?php echo $AppUI->_('Owner'); ?></th>
 	<th nowrap="nowrap"><?php echo $AppUI->_('Size'); ?></th>
-	<th nowrap="nowrap"><?php echo $AppUI->_('Type'); ?></a></th>
 	<th nowrap="nowrap"><?php echo $AppUI->_('Date'); ?></th>
 </tr>
 <?php
@@ -392,11 +403,6 @@ echo ($latest_file["contact_first_name"] . ' ' . $latest_file["contact_last_name
 		<td width="5%" nowrap="nowrap" align="right">
 		  <?php 
 echo file_size(intval($latest_file["file_size"]));
-?>
-		</td>
-		<td nowrap="nowrap">
-		  <?php 
-echo $AppUI->_(mb_substr($latest_file['file_type'], mb_strpos($latest_file['file_type'], '/')+1)); 
 ?>
 		</td>
 		<td width="15%" nowrap="nowrap" align="right">

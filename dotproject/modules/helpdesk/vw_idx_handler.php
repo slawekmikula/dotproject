@@ -14,8 +14,8 @@ function vw_idx_handler ($type) {
   	case 0:// Opened
   		$date_field_title = $AppUI->_('Opened On');
   		$date_field_name = "item_created";
-		  $where .= "(TO_DAYS(NOW()) - TO_DAYS(hi.item_updated) = 0)
-		             AND his.status_code = 0";
+		  $where .= "(TO_DAYS(NOW()) - TO_DAYS(hi.item_created) = 0)
+		             AND his.status_code = 0 and hi.item_status <> 2";
   		break;
   	case 1:// Closed
   		$date_field_title = $AppUI->_('Closed On');
@@ -57,7 +57,7 @@ function vw_idx_handler ($type) {
           p.project_id,
           p.project_name,
           p.project_color_identifier,
-          his.status_date sd
+          his.status_date
           FROM helpdesk_items hi
           LEFT JOIN helpdesk_item_status his ON his.status_item_id = hi.item_id
           LEFT JOIN users u ON u.user_id = hi.item_assigned_to
@@ -93,7 +93,7 @@ function vw_idx_handler ($type) {
       $date = new CDate( $row[$date_field_name] );
       $tc = $date->format( $format );
     } else {
-      $tc = ' ';
+      $tc = '';
     }
     if ($row['status_date']) {
       $datesd = new CDate( $row['status_date'] );

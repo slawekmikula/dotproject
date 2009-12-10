@@ -59,7 +59,8 @@ $sql = "SELECT COUNT(DISTINCT(item_id))
         	LEFT JOIN helpdesk_item_status on helpdesk_items.item_id = helpdesk_item_status.status_item_id
         WHERE 
         	status_code = 0
-        	AND (TO_DAYS(NOW()) - TO_DAYS(status_date) = 0)
+            AND item_status <> 2
+            AND (TO_DAYS(NOW()) - TO_DAYS(status_date) = 0)
         	AND $item_perms";
 
 $numopened = db_loadResult ($sql);

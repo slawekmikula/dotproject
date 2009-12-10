@@ -13,7 +13,7 @@ $sql = "SELECT hi.*,
         LEFT JOIN users u2 ON u2.user_id = hiw.user_id
         LEFT JOIN contacts ON u2.user_contact = contacts.contact_id
         LEFT JOIN projects p ON p.project_id = hi.item_project_id
-	WHERE hiw.user_id = $AppUI->user_id
+	WHERE hiw.user_id = $AppUI->user_id and hi.item_status <> 3 and hi.item_status <> 2
 	";
 	
 #print $sql;
@@ -62,7 +62,7 @@ foreach ($rows as $row) {
 	#}
 
 	#$s .= $CR . '</td>';
-	$s .= $CR . '<td><a href="./index.php?m=helpdesk&a=view&item_id='
+	$s .= $CR . '<td nowrap="nowrap"><a href="./index.php?m=helpdesk&a=view&item_id='
             . $row["item_id"]
             . '">'
 		        . '<strong>'

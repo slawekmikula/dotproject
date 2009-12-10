@@ -226,6 +226,7 @@ $sql = "
   }
   $tabBox->add( dPgetConfig('root_dir') . '/modules/helpdesk/vw_history', 'Item History' );
 
+  $tabBox->loadExtras($m);
   $tabBox->show();
 } 
 ?>

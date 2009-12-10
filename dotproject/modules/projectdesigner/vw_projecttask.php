@@ -393,6 +393,8 @@ global $st_projects_arr;
 $df = $AppUI->getPref('SHDATEFORMAT');
 $projectPriority = dPgetSysVal( 'ProjectPriority' );
 $projectStatus = dPgetSysVal( 'ProjectStatus' );
+
+if ($dPconfig['enable_gantt_charts']) {
 ?>
 <table class="tbl" cellspacing="1" cellpadding="2" border="0" width="100%">
 <td align="center">
@@ -406,3 +408,4 @@ $projectStatus = dPgetSysVal( 'ProjectStatus' );
 ?>
 </td>
 </table>
+<?php } ?>

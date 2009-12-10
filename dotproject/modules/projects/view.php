@@ -246,6 +246,12 @@ echo ('<span style="color:' . bestColor($obj->project_color_identifier) . '; fon
 	<td width="50%" valign="top">
 		<strong><?php echo $AppUI->_('Details'); ?></strong>
 		<table cellspacing="1" cellpadding="2" border="0" width="100%">
+        <tr>
+			<td align="right" nowrap><?php echo $AppUI->_('Project ID'); ?>:</td>
+            <td class="hilite" width="100%">
+            <?php echo $project_id ?>
+            </td>
+		</tr>
 		<tr>
 			<td align="right" nowrap><?php echo $AppUI->_('Company'); ?>:</td>
             <td class="hilite" width="100%"><?php 

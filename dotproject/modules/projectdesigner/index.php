@@ -623,7 +623,7 @@ var oldProj = "<?php echo $obj->project_name.':';?>";
            	<?php
                   echo '<a href="#fp" name="fp" style="display:block" onClick="expand_colapse(\'project\', \'tblProjects\')">'
            	?>
-            	<?php
+            	<?php                    
                         echo '<img id="project_expand" src="./images/icons/expand.gif" width="12" height="12" border="0" '.(isset($view_options[0]['pd_option_view_project']) ? ($view_options[0]['pd_option_view_project'] ? 'style="display:none"' : 'style="display:"') : 'style="display:none"').'><img id="project_collapse" src="./images/icons/collapse.gif" width="12" height="12" border="0" '.(isset($view_options[0]['pd_option_view_project']) ? ($view_options[0]['pd_option_view_project'] ? 'style="display:"' : 'style="display:none"') : 'style="display:"').'>';
             	?>
            	<?php
@@ -644,6 +644,9 @@ var oldProj = "<?php echo $obj->project_name.':';?>";
 </tr>
 </table>
 <br />
+<?php
+if ($dPconfig['enable_gantt_charts']) {
+?>
 <table border="0" cellpadding="4" cellspacing="0" width="100%" class="std">
 <tr>
 	<td style="border: outset #d1d1cd 1px;" colspan="2">
@@ -678,16 +681,20 @@ var oldProj = "<?php echo $obj->project_name.':';?>";
 <tr id="gantt" <?php echo (isset($view_options[0]['pd_option_view_gantt']) ? ($view_options[0]['pd_option_view_gantt'] ? 'style="visibility:visible;display:"' : 'style="visibility:collapse;display:none"') : 'style="visibility:visible;display:"');?>>
 	<td colspan="2" class="hilite">
 	<?php
-            if ($canViewTasks) {
-               require(dPgetConfig('root_dir')."/modules/projectdesigner/vw_gantt.php");
+            if ($canViewTasks) {                
+                require(dPgetConfig('root_dir')."/modules/projectdesigner/vw_gantt.php");
             } else {
-                  echo $AppUI->_('You do not have permission to view tasks');
+                echo $AppUI->_('You do not have permission to view tasks');
             }
 	?>
 	</td>
 </tr>
 </table>
 <br />
+<?php
+}
+?>
+
 <table border="0" cellpadding="4" cellspacing="0" width="100%" class="std">
 <tr>
 	<td style="border: outset #d1d1cd 1px;" colspan="2">

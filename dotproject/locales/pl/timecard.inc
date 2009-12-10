@@ -20,7 +20,7 @@
 "Project Department"=>"Podział projektowy",
 "Project/UserName"=>"Projekt/Użytkownik",
 "Report on Date Range"=>"Raport dla zakresu dat",
-"Summary Month/User/Project"=>"Podsumowanie Miesiąc/Użytkownik/Projekt",
+"Summary"=>"Podsumowanie",
 "Summary by Project"=>"Podsumowanie projektów",
 "Summary by User"=>"Podsumowanie użytkownika",
 "Task & Log Title"=>"Tytuł Zadania i Loga",
